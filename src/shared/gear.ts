@@ -39,10 +39,14 @@ export interface GearListParams {
   limit?: number;
   search?: string;
   categoryId?: string;
+  categorySlug?: string;
+  categorySlugs?: string[];
   brand?: string;
   priceMin?: number;
   priceMax?: number;
   isAvailable?: boolean;
+  startDate?: string;
+  endDate?: string;
   sortBy?: "pricePerDay" | "createdAt" | "name";
   sortOrder?: "asc" | "desc";
 }
@@ -77,6 +81,9 @@ export const fetchGearList = async (
   if (params.limit) search.set("limit", String(params.limit));
   if (params.search) search.set("search", params.search);
   if (params.categoryId) search.set("categoryId", params.categoryId);
+  if (params.categorySlug) search.set("category", params.categorySlug);
+  if (params.categorySlugs?.length)
+    search.set("category", params.categorySlugs.join(","));
   if (params.brand) search.set("brand", params.brand);
   if (params.priceMin !== undefined)
     search.set("priceMin", String(params.priceMin));
@@ -84,6 +91,8 @@ export const fetchGearList = async (
     search.set("priceMax", String(params.priceMax));
   if (params.isAvailable !== undefined)
     search.set("isAvailable", String(params.isAvailable));
+  if (params.startDate) search.set("startDate", params.startDate);
+  if (params.endDate) search.set("endDate", params.endDate);
   if (params.sortBy) search.set("sortBy", params.sortBy);
   if (params.sortOrder) search.set("sortOrder", params.sortOrder);
 
