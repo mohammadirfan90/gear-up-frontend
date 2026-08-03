@@ -17,6 +17,13 @@ export interface CreateRentalPayload {
   notes?: string;
 }
 
+export interface RentalOrderItem {
+  id: string;
+  quantity: number;
+  pricePerDay: number;
+  subtotal: number;
+}
+
 export interface RentalOrder {
   id: string;
   startDate: string;
@@ -30,12 +37,26 @@ export interface RentalOrder {
     | "returned"
     | "cancelled";
   notes?: string | null;
-  items: {
-    id: string;
-    quantity: number;
-    pricePerDay: number;
-    subtotal: number;
-  }[];
+  createdAt: string;
+  items: RentalOrderItem[];
+}
+
+export interface RentalListResult {
+  items: RentalOrder[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
+}
+
+export interface RentalListParams {
+  page?: number;
+  limit?: number;
+  status?: RentalOrder["status"];
 }
 
 export const fetchOccupiedDates = async (
@@ -54,6 +75,20 @@ export const fetchOccupiedDates = async (
   } catch {
     return [];
   }
+};
+
+export const fetchMyRentals = async (
+  params: RentalListParams = {},
+): Promise<RentalListResult> => {
+  const search = new URLSearchParams();
+  if (params.page) search.set("page", String(params.page));
+  if (params.limit) search.set("limit", String(params.limit));
+  if (params.status) search.set("status", params.status);
+
+  const { data } = await api.get<ApiEnvelope<RentalListResult>>(
+    `/rentals?${search.toString()}`,
+  );
+  return data.data;
 };
 
 export const createRentalOrder = async (
