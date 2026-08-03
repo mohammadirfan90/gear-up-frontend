@@ -1,10 +1,7 @@
 import Link from "next/link";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import {
   ArrowLeftIcon,
-  ArrowRightIcon,
-  CalendarBlankIcon,
   CheckCircleIcon,
   MapPinIcon,
   PackageIcon,
@@ -13,19 +10,12 @@ import {
   UserCircleIcon,
 } from "@phosphor-icons/react/dist/ssr";
 import { fetchGearById, fetchGearReviews, type GearDetail, type GearReview } from "@/shared/gear";
-import { Button } from "@/components/ui/Button";
 import { GearGallery } from "@/components/GearGallery";
+import { BookingCard } from "@/components/BookingCard";
 
 interface GearDetailPageProps {
   params: Promise<{ id: string }>;
 }
-
-const formatPrice = (value: number) =>
-  new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  }).format(value);
 
 const formatDate = (value: string) =>
   new Intl.DateTimeFormat("en-US", {
@@ -178,38 +168,12 @@ function DetailView({ gear, reviews }: { gear: GearDetail; reviews: GearReview[]
         </div>
 
         <aside className="lg:sticky lg:top-24">
-          <div className="rounded-xl border border-border glass-strong p-6 shadow-elevated">
-            <div className="flex items-end justify-between gap-3 border-b border-border pb-5">
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.15em] text-muted-foreground">Rental rate</p>
-                <p className="mt-1 text-3xl font-semibold text-foreground">
-                  {formatPrice(gear.pricePerDay)}
-                  <span className="ml-1 text-sm font-medium text-muted-foreground">/ day</span>
-                </p>
-              </div>
-              <span className="inline-flex items-center gap-1 text-[11px] text-amber-300">
-                <StarIcon weight="fill" className="h-3 w-3" />
-                {average ? average.toFixed(1) : "New"}
-              </span>
-            </div>
-            <div className="flex flex-col gap-3 py-5">
-              <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
-                <CalendarBlankIcon weight="duotone" className="h-4 w-4 text-lime-400" />
-                Choose dates next
-              </div>
-              <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
-                <ShieldCheckIcon weight="duotone" className="h-4 w-4 text-lime-400" />
-                Verified and protected
-              </div>
-            </div>
-            <Button asChild size="lg" className="w-full">
-              <Link href={`/gear/${gear.id}/rent`}>
-                Rent this gear
-                <ArrowRightIcon weight="bold" className="h-4 w-4" />
-              </Link>
-            </Button>
-            <p className="mt-3 text-center text-[11px] text-muted-foreground">No commitment until you confirm your dates.</p>
-          </div>
+          <BookingCard
+            gearId={gear.id}
+            pricePerDay={gear.pricePerDay}
+            stock={gear.stock}
+            isAvailable={gear.isAvailable}
+          />
 
           <div className="mt-4 rounded-xl border border-border bg-card/50 p-5">
             <div className="flex items-start gap-3">
@@ -228,6 +192,10 @@ function DetailView({ gear, reviews }: { gear: GearDetail; reviews: GearReview[]
             <div className="mt-4 flex items-center gap-2 border-t border-border pt-4 text-[12px] text-muted-foreground">
               <MapPinIcon weight="duotone" className="h-3.5 w-3.5" />
               Pickup details shared after booking
+            </div>
+            <div className="mt-3 flex items-center gap-2 text-[12px] text-muted-foreground">
+              <ShieldCheckIcon weight="duotone" className="h-3.5 w-3.5" />
+              Verified and protected
             </div>
           </div>
         </aside>
