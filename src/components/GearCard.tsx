@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import ImageWithFallback from "@/components/ImageWithFallback";
 import { StarIcon, ShieldCheckIcon } from "@phosphor-icons/react/dist/ssr";
 import { cn } from "@/shared/utils/cn";
 import type { GearSummary } from "@/shared/gear";
@@ -36,25 +36,15 @@ export function GearCard({ gear, className }: GearCardProps) {
       )}
     >
       <div className="relative aspect-[4/3] overflow-hidden">
-        {cover ? (
-          <Image
-            src={cover}
-            alt={gear.name}
-            fill
-            sizes="(min-width: 1024px) 320px, (min-width: 640px) 50vw, 100vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-          />
-        ) : (
-          <div
-            className={cn(
-              "absolute inset-0 bg-gradient-to-br",
-              fallback,
-            )}
-          >
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.18),transparent_60%)]" />
-            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/70 to-transparent" />
-          </div>
-        )}
+        <ImageWithFallback
+          src={cover}
+          alt={gear.name}
+          fill
+          sizes="(min-width: 1024px) 320px, (min-width: 640px) 50vw, 100vw"
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+          fallbackClassName={cn("bg-gradient-to-br", fallback)}
+          fallbackLabel="No image"
+        />
         <div className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-md border border-white/10 bg-black/60 px-2 py-1 text-[11px] font-medium text-white backdrop-blur">
           <ShieldCheckIcon weight="duotone" className="h-3 w-3 text-lime-300" />
           {gear.isAvailable ? "Available" : "Unavailable"}

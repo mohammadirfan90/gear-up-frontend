@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -15,6 +16,38 @@ import { BookingCard } from "@/components/BookingCard";
 
 interface GearDetailPageProps {
   params: Promise<{ id: string }>;
+}
+
+export async function generateMetadata({ params }: GearDetailPageProps): Promise<Metadata> {
+  const { id } = await params;
+  try {
+    const gear = await fetchGearById(id);
+    return {
+      title: gear.name,
+      description: gear.description.slice(0, 160),
+      openGraph: {
+        title: `${gear.name} — GearUp`,
+        description: gear.description.slice(0, 160),
+        type: "website",
+        siteName: "GearUp",
+        images: gear.images?.[0] ? [{ url: gear.images[0] }] : undefined,
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: `${gear.name} — GearUp`,
+        description: gear.description.slice(0, 160),
+        images: gear.images?.[0] ? [gear.images[0]] : undefined,
+      },
+      alternates: {
+        canonical: `/gear/${id}`,
+      },
+    };
+  } catch {
+    return {
+      title: "Gear details",
+      description: "View specifications, pricing, and availability for this piece of gear.",
+    };
+  }
 }
 
 const formatDate = (value: string) =>

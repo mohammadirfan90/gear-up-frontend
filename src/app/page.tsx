@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRightIcon,
@@ -17,6 +18,28 @@ import { HeroSearch } from "@/components/HeroSearch";
 import { CategoryCarousel } from "@/components/CategoryCarousel";
 import { fetchFeaturedGear, type GearSummary } from "@/shared/gear";
 import { fetchCategories } from "@/shared/categories";
+
+export const metadata: Metadata = {
+  title: "GearUp — Rent Sports & Outdoor Gear Instantly",
+  description:
+    "Premium sports and outdoor gear rentals. Browse curated equipment, book by the day, and pay securely with GearUp.",
+  openGraph: {
+    title: "GearUp — Rent Sports & Outdoor Gear Instantly",
+    description:
+      "Premium sports and outdoor gear rentals. Browse curated equipment, book by the day, and pay securely with GearUp.",
+    type: "website",
+    siteName: "GearUp",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "GearUp — Rent Sports & Outdoor Gear Instantly",
+    description:
+      "Premium sports and outdoor gear rentals. Browse curated equipment, book by the day, and pay securely with GearUp.",
+  },
+  alternates: {
+    canonical: "/",
+  },
+};
 
 const fallbackGear: GearSummary[] = [
   {

@@ -1,11 +1,28 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { GearBrowser } from "./GearBrowser";
 import { fetchCategories } from "@/shared/categories";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Browse Gear",
   description:
     "Find your next piece of gear from a curated marketplace of premium sports and outdoor equipment.",
+  openGraph: {
+    title: "Browse Gear — GearUp",
+    description:
+      "Find your next piece of gear from a curated marketplace of premium sports and outdoor equipment.",
+    type: "website",
+    siteName: "GearUp",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Browse Gear — GearUp",
+    description:
+      "Find your next piece of gear from a curated marketplace of premium sports and outdoor equipment.",
+  },
+  alternates: {
+    canonical: "/gear",
+  },
 };
 
 export default async function GearPage() {

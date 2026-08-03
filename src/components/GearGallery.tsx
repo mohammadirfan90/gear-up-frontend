@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
-import { CaretLeftIcon, CaretRightIcon, ImageIcon } from "@phosphor-icons/react/dist/ssr";
+import { CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react/dist/ssr";
 import { cn } from "@/shared/utils/cn";
+import { ImageWithFallback } from "@/components/ImageWithFallback";
 
 interface GearGalleryProps {
   images: string[];
@@ -35,22 +35,21 @@ export function GearGallery({ images, name }: GearGalleryProps) {
     <div className="flex flex-col gap-3">
       <div className="relative aspect-[4/3] overflow-hidden rounded-xl border border-border bg-card">
         {hasImages ? (
-          <Image
+          <ImageWithFallback
+            key={images[activeIndex]}
             src={images[activeIndex]}
             alt={name}
             fill
             priority
             sizes="(min-width: 1024px) 60vw, 100vw"
             className="object-cover transition-opacity duration-500"
+            fallbackClassName={cn("bg-gradient-to-br", fallback)}
+            fallbackLabel="Image pending"
           />
         ) : (
           <div className={cn("absolute inset-0 bg-gradient-to-br", fallback)}>
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.18),transparent_60%)]" />
             <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/70 to-transparent" />
-            <span className="absolute right-6 top-6 inline-flex items-center gap-1.5 rounded-md border border-white/10 bg-black/60 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur">
-              <ImageIcon weight="duotone" className="h-3 w-3" />
-              Image pending
-            </span>
           </div>
         )}
 
@@ -94,12 +93,13 @@ export function GearGallery({ images, name }: GearGalleryProps) {
               )}
               aria-label={`Show image ${index + 1}`}
             >
-              <Image
+              <ImageWithFallback
                 src={image}
                 alt={`${name} ${index + 1}`}
                 fill
                 sizes="120px"
                 className="object-cover"
+                fallbackLabel="—"
               />
             </button>
           ))}
