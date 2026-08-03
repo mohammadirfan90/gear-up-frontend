@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
+import { Providers } from "./providers";
+import { Navbar } from "@/components/Navbar";
+import { AuthInitializer } from "@/components/AuthInitializer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -68,9 +71,33 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} dark h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        <div className="relative isolate flex min-h-screen flex-col">
-          {children}
-        </div>
+        <Providers>
+          <AuthInitializer>
+            <div className="relative isolate flex min-h-screen flex-col">
+              <Navbar />
+              <main className="flex flex-1 flex-col">{children}</main>
+              <footer className="border-t border-border bg-background">
+                <div className="container mx-auto flex flex-col items-center justify-between gap-4 px-6 py-8 sm:flex-row">
+                  <p className="text-xs text-muted-foreground">
+                    © {new Date().getFullYear()} GearUp. Crafted with care for
+                    adventurers.
+                  </p>
+                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                    <a href="#" className="transition-colors hover:text-foreground">
+                      Privacy
+                    </a>
+                    <a href="#" className="transition-colors hover:text-foreground">
+                      Terms
+                    </a>
+                    <a href="#" className="transition-colors hover:text-foreground">
+                      Support
+                    </a>
+                  </div>
+                </div>
+              </footer>
+            </div>
+          </AuthInitializer>
+        </Providers>
       </body>
     </html>
   );
