@@ -22,6 +22,21 @@ export interface RentalOrderItem {
   quantity: number;
   pricePerDay: number;
   subtotal: number;
+  gearItem?: {
+    id: string;
+    name: string;
+    brand: string;
+    images: string[];
+    pricePerDay: number;
+    providerId?: string;
+  };
+}
+
+export interface RentalOrderPayment {
+  id: string;
+  status: string;
+  amount: number;
+  provider: string;
 }
 
 export interface RentalOrder {
@@ -39,6 +54,12 @@ export interface RentalOrder {
   notes?: string | null;
   createdAt: string;
   items: RentalOrderItem[];
+  payments?: RentalOrderPayment[];
+  customer?: {
+    id: string;
+    name: string;
+    email: string;
+  };
 }
 
 export interface RentalListResult {
@@ -89,6 +110,13 @@ export const fetchMyRentals = async (
     `/rentals?${search.toString()}`,
   );
   return data.data;
+};
+
+export const fetchRentalOrder = async (orderId: string): Promise<RentalOrder> => {
+  const { data } = await api.get<ApiEnvelope<{ order: RentalOrder }>>(
+    `/rentals/${orderId}`,
+  );
+  return data.data.order;
 };
 
 export const createRentalOrder = async (
