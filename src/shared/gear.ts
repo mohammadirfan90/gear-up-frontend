@@ -34,6 +34,33 @@ export interface GearListResult {
   };
 }
 
+export interface GearReview {
+  id: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+  customer: {
+    id: string;
+    name: string;
+  };
+}
+
+export interface GearDetail extends GearSummary {
+  specifications: Record<string, unknown> | null;
+  reviewCount: number;
+  avgRating: number | null;
+  reviews?: GearReview[];
+}
+
+export interface GearReviewsResult {
+  items: GearReview[];
+  stats: {
+    average: number;
+    count: number;
+  };
+  pagination: GearListResult["pagination"];
+}
+
 export interface GearListParams {
   page?: number;
   limit?: number;
@@ -96,10 +123,9 @@ export const fetchGearList = async (
   if (params.sortBy) search.set("sortBy", params.sortBy);
   if (params.sortOrder) search.set("sortOrder", params.sortOrder);
 
-  const response = await fetch(
-    `${API_BASE_URL}/gear?${search.toString()}`,
-    { cache: "no-store" },
-  );
+  const response = await fetch(`${API_BASE_URL}/gear?${search.toString()}`, {
+    cache: "no-store",
+  });
   if (!response.ok) {
     throw new Error(`Gear list request failed: ${response.status}`);
   }
@@ -107,13 +133,27 @@ export const fetchGearList = async (
   return payload.data;
 };
 
-export const fetchGearById = async (id: string): Promise<GearSummary> => {
+export const fetchGearById = async (id: string): Promise<GearDetail> => {
   const response = await fetch(`${API_BASE_URL}/gear/${id}`, {
     cache: "no-store",
   });
   if (!response.ok) {
     throw new Error(`Gear detail request failed: ${response.status}`);
   }
-  const payload = (await response.json()) as ApiEnvelope<{ gear: GearSummary }>;
+  const payload = (await response.json()) as ApiEnvelope<{ gear: GearDetail }>;
   return payload.data.gear;
+};
+
+export const fetchGearReviews = async (
+  gearId: string,
+): Promise<GearReviewsResult> => {
+  const response = await fetch(
+    `${API_BASE_URL}/reviews/gear/${gearId}?page=1&limit=10`,
+    { cache: "no-store" },
+  );
+  if (!response.ok) {
+    throw new Error(`Review request failed: ${response.status}`);
+  }
+  const payload = (await response.json()) as ApiEnvelope<GearReviewsResult>;
+  return payload.data;
 };
