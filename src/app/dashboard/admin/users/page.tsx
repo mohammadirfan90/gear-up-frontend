@@ -4,6 +4,7 @@ import Link from "next/link";
 import {
   ArrowRightIcon,
   PackageIcon,
+  ReceiptIcon,
   ShoppingBagIcon,
   UserCircleIcon,
   UsersIcon,
@@ -27,9 +28,15 @@ const tabs: DashboardTab[] = [
     description: "Manage accounts and roles",
   },
   {
+    label: "Rentals",
+    href: "/dashboard/admin/rentals",
+    icon: PackageIcon,
+    description: "Audit rentals and transactions",
+  },
+  {
     label: "Gear",
     href: "/dashboard/admin/gear",
-    icon: PackageIcon,
+    icon: ReceiptIcon,
     description: "Moderate listings",
   },
   {

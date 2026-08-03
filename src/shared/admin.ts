@@ -108,3 +108,55 @@ export const updateAdminUserStatus = async (
   );
   return data.data.user;
 };
+
+export interface AdminRental {
+  id: string;
+  startDate: string;
+  endDate: string;
+  totalAmount: number;
+  status:
+    | "placed"
+    | "confirmed"
+    | "paid"
+    | "picked_up"
+    | "returned"
+    | "cancelled";
+  createdAt: string;
+  customer: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  items: { id: string }[];
+}
+
+export interface AdminRentalListResult {
+  items: AdminRental[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
+}
+
+export interface AdminRentalListParams {
+  page?: number;
+  limit?: number;
+  status?: AdminRental["status"];
+}
+
+export const fetchAdminRentals = async (
+  params: AdminRentalListParams = {},
+): Promise<AdminRentalListResult> => {
+  const search = new URLSearchParams();
+  if (params.page) search.set("page", String(params.page));
+  if (params.limit) search.set("limit", String(params.limit));
+  if (params.status) search.set("status", params.status);
+  const { data } = await api.get<ApiEnvelope<AdminRentalListResult>>(
+    `/admin/rentals?${search.toString()}`,
+  );
+  return data.data;
+};

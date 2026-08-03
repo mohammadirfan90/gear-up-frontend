@@ -8,6 +8,7 @@ import {
   ClockCountdownIcon,
   GearIcon,
   PackageIcon,
+  ReceiptIcon,
   ShieldCheckIcon,
   ShoppingBagIcon,
   SpinnerGapIcon,
@@ -35,9 +36,15 @@ const tabs: DashboardTab[] = [
     description: "Manage accounts and roles",
   },
   {
+    label: "Rentals",
+    href: "/dashboard/admin/rentals",
+    icon: PackageIcon,
+    description: "Audit rentals and transactions",
+  },
+  {
     label: "Gear",
     href: "/dashboard/admin/gear",
-    icon: PackageIcon,
+    icon: ReceiptIcon,
     description: "Moderate listings",
   },
   {
@@ -267,6 +274,12 @@ export default function AdminDashboardPage() {
               <Button asChild variant="secondary" className="justify-between">
                 <Link href="/dashboard/admin/users">
                   Manage users
+                  <ArrowRightIcon weight="bold" className="h-3.5 w-3.5" />
+                </Link>
+              </Button>
+              <Button asChild variant="secondary" className="justify-between">
+                <Link href="/dashboard/admin/rentals">
+                  Audit rentals
                   <ArrowRightIcon weight="bold" className="h-3.5 w-3.5" />
                 </Link>
               </Button>
