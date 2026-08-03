@@ -14,7 +14,9 @@ import {
 } from "@phosphor-icons/react/dist/ssr";
 import { GearCard } from "@/components/GearCard";
 import { HeroSearch } from "@/components/HeroSearch";
+import { CategoryCarousel } from "@/components/CategoryCarousel";
 import { fetchFeaturedGear, type GearSummary } from "@/shared/gear";
+import { fetchCategories } from "@/shared/categories";
 
 const fallbackGear: GearSummary[] = [
   {
@@ -150,7 +152,10 @@ function FeatureVisual({ type }: { type: string }) {
 }
 
 export default async function Home() {
-  const fetchedGear = await fetchFeaturedGear(4);
+  const [fetchedGear, fetchedCategories] = await Promise.all([
+    fetchFeaturedGear(4),
+    fetchCategories(),
+  ]);
   const featuredGear = fetchedGear.length > 0 ? fetchedGear : fallbackGear;
 
   return (
@@ -193,6 +198,32 @@ export default async function Home() {
               Book in minutes
             </span>
           </div>
+        </div>
+      </section>
+
+      <section className="relative border-b border-border bg-background px-6 py-20 sm:py-24">
+        <div className="container mx-auto max-w-6xl">
+          <div className="mb-10 flex items-end justify-between">
+            <div>
+              <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-lime-400">
+                Browse by activity
+              </p>
+              <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+                Pick your playground.
+              </h2>
+            </div>
+            <Link
+              href="/gear"
+              className="group hidden items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground sm:flex"
+            >
+              All categories
+              <ArrowUpRightIcon
+                weight="bold"
+                className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+              />
+            </Link>
+          </div>
+          <CategoryCarousel categories={fetchedCategories} />
         </div>
       </section>
 
