@@ -72,6 +72,7 @@ export interface GearListParams {
   priceMin?: number;
   priceMax?: number;
   isAvailable?: boolean;
+  providerId?: string;
   startDate?: string;
   endDate?: string;
   sortBy?: "pricePerDay" | "createdAt" | "name";
@@ -118,6 +119,7 @@ export const fetchGearList = async (
     search.set("priceMax", String(params.priceMax));
   if (params.isAvailable !== undefined)
     search.set("isAvailable", String(params.isAvailable));
+  if (params.providerId) search.set("providerId", params.providerId);
   if (params.startDate) search.set("startDate", params.startDate);
   if (params.endDate) search.set("endDate", params.endDate);
   if (params.sortBy) search.set("sortBy", params.sortBy);
