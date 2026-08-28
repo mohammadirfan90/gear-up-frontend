@@ -32,6 +32,18 @@ The backend is not included in this submission. The app talks to an external API
 | `/payment/success` | Payment success landing |
 | `/payment/cancel` | Payment cancelled / failed landing |
 
+## Demo Credentials & Fast Evaluation
+
+For evaluation and testing convenience, **1-click quick-fill buttons** are available directly on the sign-in page (`/auth/login`). You can also manually sign in with any of the seeded roles below:
+
+| Role | Email | Password | Access / Scope |
+|---|---|---|---|
+| **Customer** | `customer@gearup.com` | `Customer@12345` | Browse gear, booking checkout, customer orders & Stripe payments |
+| **Provider** | `provider@gearup.com` | `Provider@12345` | Provider dashboard, inventory management (Add/Edit Gear), incoming order confirmation & pickup workflow |
+| **Admin** | `admin@gearup.com` | `Admin@12345` | Global platform overview, user management (suspend/activate), gear & rental order content moderation |
+
+> ℹ️ **Note on Authentication:** Real, secure authentication is fully implemented end-to-end (passwords hashed with `bcrypt`, JWT access and refresh token rotation, HttpOnly/SameSite cookies, and server-side role validation via `requireRole`). The demo credentials and 1-click quick-fill buttons are provided strictly for reviewer convenience and seamless evaluation.
+
 ## Environment Variables
 
 Copy `.env.example` to `.env.local` and fill in:

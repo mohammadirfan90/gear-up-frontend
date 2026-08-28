@@ -12,12 +12,34 @@ import { Field, Input } from "@/components/ui/Input";
 import { useAuthStore } from "@/store/authStore";
 import { loginSchema, type LoginFormValues } from "@/shared/validators/auth";
 import { isSafeNextPath } from "@/shared/redirects";
+import { cn } from "@/shared/utils/cn";
 
 const dashboardPath = (role: "customer" | "provider" | "admin") => {
   if (role === "customer") return "/dashboard/customer";
   if (role === "provider") return "/dashboard/provider";
   return "/dashboard/admin";
 };
+
+const DEMO_ACCOUNTS = [
+  {
+    role: "Customer",
+    email: "customer@gearup.com",
+    password: "Customer@12345",
+    tone: "hover:border-blue-500/50 hover:bg-blue-500/10 text-blue-700 dark:text-blue-300",
+  },
+  {
+    role: "Provider",
+    email: "provider@gearup.com",
+    password: "Provider@12345",
+    tone: "hover:border-teal-500/50 hover:bg-teal-500/10 text-teal-700 dark:text-teal-300",
+  },
+  {
+    role: "Admin",
+    email: "admin@gearup.com",
+    password: "Admin@12345",
+    tone: "hover:border-purple-500/50 hover:bg-purple-500/10 text-purple-700 dark:text-purple-300",
+  },
+];
 
 function LoginForm() {
   const router = useRouter();
@@ -32,10 +54,17 @@ function LoginForm() {
     handleSubmit,
     formState: { errors, isSubmitting },
     setError,
+    setValue,
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
   });
+
+  const fillDemo = (email: string, pass: string, role: string) => {
+    setValue("email", email, { shouldValidate: true });
+    setValue("password", pass, { shouldValidate: true });
+    toast.success(`Filled ${role} demo credentials`);
+  };
 
   const onSubmit = async (values: LoginFormValues) => {
     try {
@@ -58,10 +87,36 @@ function LoginForm() {
   return (
     <>
       {reason === "expired" ? (
-        <p className="mb-5 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-center text-[12px] text-amber-300">
+        <p className="mb-5 rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-center text-[12px] text-amber-600 dark:text-amber-300">
           Your session expired. Please sign in again.
         </p>
       ) : null}
+
+      {/* Demo Credentials Quick-Fill */}
+      <div className="mb-5 rounded-xl border border-border bg-card/50 p-4 shadow-sm">
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+            Demo Accounts (1-Click Fill)
+          </span>
+          <span className="text-[10px] text-muted-foreground">For evaluation</span>
+        </div>
+        <div className="mt-2.5 grid grid-cols-3 gap-2">
+          {DEMO_ACCOUNTS.map((acc) => (
+            <button
+              key={acc.role}
+              type="button"
+              onClick={() => fillDemo(acc.email, acc.password, acc.role)}
+              className={cn(
+                "flex flex-col items-center rounded-lg border border-border bg-background/80 px-2 py-2 text-center transition-all hover:scale-[1.02] active:scale-[0.98]",
+                acc.tone,
+              )}
+            >
+              <span className="text-[12px] font-semibold">{acc.role}</span>
+              <span className="text-[10px] text-muted-foreground">Click to fill</span>
+            </button>
+          ))}
+        </div>
+      </div>
       <form
         onSubmit={handleSubmit(onSubmit)}
         noValidate
