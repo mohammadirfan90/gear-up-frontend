@@ -87,8 +87,13 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
     }
 
     try {
-      await get().fetchProfile();
+      const user = await get().fetchProfile();
+      if (!user) {
+        removeTokenCookies();
+        set({ isAuthenticated: false, user: null });
+      }
     } catch {
+      removeTokenCookies();
       set({ isAuthenticated: false, user: null });
     } finally {
       set({ isInitializing: false });
@@ -179,6 +184,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       set({ user: data.data.user, isAuthenticated: true, error: null });
       return data.data.user;
     } catch (err) {
+      removeTokenCookies();
       const message = extractErrorMessage(err, "Unable to load profile.");
       set({ error: message, isAuthenticated: false, user: null });
       return null;

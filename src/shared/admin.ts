@@ -160,3 +160,56 @@ export const fetchAdminRentals = async (
   );
   return data.data;
 };
+
+export interface AdminGearItem {
+  id: string;
+  name: string;
+  description: string;
+  brand: string | null;
+  pricePerDay: number;
+  stock: number;
+  isAvailable: boolean;
+  images: string[];
+  specifications: Record<string, string | number> | null;
+  createdAt: string;
+  category: {
+    id: string;
+    name: string;
+  };
+  provider: {
+    id: string;
+    name: string;
+    email: string;
+  };
+}
+
+export interface AdminGearListResult {
+  items: AdminGearItem[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
+}
+
+export interface AdminGearListParams {
+  page?: number;
+  limit?: number;
+  isAvailable?: boolean;
+}
+
+export const fetchAdminGear = async (
+  params: AdminGearListParams = {},
+): Promise<AdminGearListResult> => {
+  const search = new URLSearchParams();
+  if (params.page) search.set("page", String(params.page));
+  if (params.limit) search.set("limit", String(params.limit));
+  if (params.isAvailable !== undefined) search.set("isAvailable", String(params.isAvailable));
+  const { data } = await api.get<ApiEnvelope<AdminGearListResult>>(
+    `/admin/gear?${search.toString()}`,
+  );
+  return data.data;
+};

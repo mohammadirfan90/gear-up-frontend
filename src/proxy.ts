@@ -51,25 +51,11 @@ export function proxy(request: NextRequest) {
     if (refreshToken) {
       loginUrl.searchParams.set("reason", "expired");
     }
-    return NextResponse.redirect(loginUrl);
-  }
-
-  const isAuthPage = AUTH_PATHS.includes(pathname);
-  if (isAuthPage && hasUsableAccess) {
-    // UX hint only. Real role enforcement is in the server-side dashboard
-    // layout; this just avoids showing the login form to a logged-in user.
-    const role = payload?.role;
-    const home = request.nextUrl.clone();
-    home.pathname =
-      role === "customer"
-        ? "/dashboard/customer"
-        : role === "provider"
-          ? "/dashboard/provider"
-          : role === "admin"
-            ? "/dashboard/admin"
-            : "/";
-    home.search = "";
-    return NextResponse.redirect(home);
+    const response = NextResponse.redirect(loginUrl);
+    if (!hasUsableAccess && accessToken) {
+      response.cookies.delete(ACCESS_TOKEN_COOKIE);
+    }
+    return response;
   }
 
   return NextResponse.next();
@@ -78,7 +64,5 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     "/dashboard/:path*",
-    "/auth/login",
-    "/auth/register",
   ],
 };

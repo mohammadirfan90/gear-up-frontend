@@ -20,8 +20,11 @@ export function ImageWithFallback({
   ...props
 }: ImageWithFallbackProps) {
   const [failed, setFailed] = useState(false);
+  const isPlaceholder =
+    typeof src === "string" &&
+    (src.includes("example.com") || src.includes("placeholder.com") || (!src.startsWith("http") && !src.startsWith("/")));
 
-  if (!src || failed) {
+  if (!src || failed || isPlaceholder) {
     return (
       <div
         role="img"
