@@ -13,7 +13,7 @@ interface GearGalleryProps {
 const FALLBACK_GRADIENTS = [
   "from-amber-300/40 via-rose-500/20 to-fuchsia-700/30",
   "from-cyan-300/40 via-sky-500/20 to-indigo-700/30",
-  "from-lime-300/40 via-emerald-500/20 to-teal-700/30",
+  "from-emerald-300/40 via-teal-500/20 to-emerald-700/30",
   "from-orange-300/40 via-pink-500/20 to-purple-700/30",
 ];
 
@@ -88,8 +88,8 @@ export function GearGallery({ images, name }: GearGalleryProps) {
               className={cn(
                 "relative aspect-square overflow-hidden rounded-md border transition-all",
                 index === activeIndex
-                  ? "border-lime-400 shadow-glow"
-                  : "border-border hover:border-lime-400/40",
+                  ? "border-emerald-500 shadow-glow"
+                  : "border-border hover:border-emerald-500/40",
               )}
               aria-label={`Show image ${index + 1}`}
             >

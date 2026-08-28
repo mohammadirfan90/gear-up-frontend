@@ -1,8 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { Agentation } from "agentation";
 import "./globals.css";
 import { Providers } from "./providers";
-import { Navbar } from "@/components/Navbar";
+import { NavbarGate } from "@/components/NavbarGate";
 import { AuthInitializer } from "@/components/AuthInitializer";
 
 const geistSans = Geist({
@@ -32,6 +33,13 @@ export const metadata: Metadata = {
     "A premium rentals marketplace for sports and outdoor gear. Browse curated equipment, book by the day, and pay securely.",
   applicationName: "GearUp",
   authors: [{ name: "GearUp" }],
+  icons: {
+    icon: [
+      { url: "/gear.avif", type: "image/avif" },
+    ],
+    shortcut: "/gear.avif",
+    apple: "/gear.avif",
+  },
   keywords: [
     "GearUp",
     "sports gear rental",
@@ -68,13 +76,14 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} dark h-full antialiased`}
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <Providers>
           <AuthInitializer>
             <div className="relative isolate flex min-h-screen flex-col">
-              <Navbar />
+              <NavbarGate />
               <main className="flex flex-1 flex-col">{children}</main>
               <footer className="border-t border-border bg-background">
                 <div className="container mx-auto flex flex-col items-center justify-between gap-4 px-6 py-8 sm:flex-row">
@@ -98,6 +107,7 @@ export default function RootLayout({
             </div>
           </AuthInitializer>
         </Providers>
+        {process.env.NODE_ENV === "development" && <Agentation />}
       </body>
     </html>
   );

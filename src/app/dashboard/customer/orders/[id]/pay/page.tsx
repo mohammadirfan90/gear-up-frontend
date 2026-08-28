@@ -12,6 +12,7 @@ import {
   PackageIcon,
   ReceiptIcon,
   UserCircleIcon,
+  WarningCircleIcon,
 } from "@phosphor-icons/react/dist/ssr";
 import { DashboardShell, type DashboardTab } from "@/components/DashboardShell";
 import { Button } from "@/components/ui/Button";
@@ -83,7 +84,10 @@ export default function PayOrderPage({ params }: PayPageProps) {
   const order = orderQuery.data;
   const shortId = id.slice(-8).toUpperCase();
   const totalAmount = Number(order?.totalAmount ?? 0);
-  const payable = order?.status === "placed" || order?.status === "confirmed";
+  // Only a provider-confirmed order can be paid — that is the documented
+  // state machine (placed → confirmed → paid) and the server enforces it.
+  const payable = order?.status === "confirmed";
+  const awaitingConfirmation = order?.status === "placed";
 
   return (
     <DashboardShell
@@ -137,15 +141,47 @@ export default function PayOrderPage({ params }: PayPageProps) {
               orderShortId={shortId}
             />
           ) : order ? (
-            <div className="rounded-lg border border-emerald-400/20 bg-emerald-500/5 p-5">
+            // Every non-payable status lands here — a cancelled order is not
+            // "already paid", so the copy and tone follow the actual status.
+            <div
+              className={cn(
+                "rounded-lg border p-5",
+                order.status === "cancelled"
+                  ? "border-destructive/25 bg-destructive/5"
+                  : awaitingConfirmation
+                    ? "border-amber-400/25 bg-amber-500/5"
+                    : "border-emerald-400/20 bg-emerald-500/5",
+              )}
+            >
               <div className="flex items-start gap-3">
-                <CheckCircleIcon
-                  weight="duotone"
-                  className="mt-0.5 h-5 w-5 shrink-0 text-emerald-300"
-                />
+                {order.status === "cancelled" ? (
+                  <WarningCircleIcon
+                    weight="duotone"
+                    className="mt-0.5 h-5 w-5 shrink-0 text-destructive"
+                  />
+                ) : awaitingConfirmation ? (
+                  <ClockCountdownIcon
+                    weight="duotone"
+                    className="mt-0.5 h-5 w-5 shrink-0 text-amber-300"
+                  />
+                ) : (
+                  <CheckCircleIcon
+                    weight="duotone"
+                    className="mt-0.5 h-5 w-5 shrink-0 text-emerald-300"
+                  />
+                )}
                 <div>
                   <p className="text-sm font-semibold text-foreground">
-                    This order is already paid
+                    {order.status === "cancelled"
+                      ? "This order was cancelled"
+                      : awaitingConfirmation
+                        ? "Waiting for the provider to confirm"
+                        : "This order is already paid"}
+                  </p>
+                  <p className="mt-1 text-[13px] leading-6 text-muted-foreground">
+                    {awaitingConfirmation
+                      ? "The provider still needs to accept your booking. You'll be able to pay as soon as they confirm — check back shortly."
+                      : null}
                   </p>
                   <p className="mt-1 text-[13px] leading-6 text-muted-foreground">
                     Status:{" "}
@@ -244,19 +280,19 @@ export default function PayOrderPage({ params }: PayPageProps) {
             <h3 className="text-sm font-semibold text-foreground">What happens next</h3>
             <ol className="mt-3 space-y-2.5 text-[12px] text-muted-foreground">
               <li className="flex items-start gap-2">
-                <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-lime-400/30 bg-lime-400/10 text-[10px] font-semibold text-lime-300">
+                <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-emerald-500/30 bg-emerald-500/10 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
                   1
                 </span>
                 Your payment is confirmed instantly via Stripe.
               </li>
               <li className="flex items-start gap-2">
-                <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-lime-400/30 bg-lime-400/10 text-[10px] font-semibold text-lime-300">
+                <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-emerald-500/30 bg-emerald-500/10 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
                   2
                 </span>
                 The provider marks the order <strong className="text-foreground">Picked up</strong> on pickup day.
               </li>
               <li className="flex items-start gap-2">
-                <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-lime-400/30 bg-lime-400/10 text-[10px] font-semibold text-lime-300">
+                <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-emerald-500/30 bg-emerald-500/10 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
                   3
                 </span>
                 After return, you can leave a review from the order page.

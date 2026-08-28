@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/Button";
 import { Field, Input } from "@/components/ui/Input";
 import { useAuthStore } from "@/store/authStore";
 import { loginSchema, type LoginFormValues } from "@/shared/validators/auth";
+import { isSafeNextPath } from "@/shared/redirects";
 
 const dashboardPath = (role: "customer" | "provider" | "admin") => {
   if (role === "customer") return "/dashboard/customer";
@@ -40,7 +41,11 @@ function LoginForm() {
     try {
       const user = await login(values);
       toast.success(`Welcome back, ${user.name.split(" ")[0]}`);
-      const target = nextParam || dashboardPath(user.role);
+      // SECURITY: validate `next` against an allowlist to prevent open-redirect
+      // phishing. Anything that isn't a same-origin path falls back to the
+      // role-default dashboard.
+      const safeNext = isSafeNextPath(nextParam) ? nextParam : null;
+      const target = safeNext ?? dashboardPath(user.role);
       router.push(target);
       router.refresh();
     } catch (err) {
@@ -136,7 +141,7 @@ export default function LoginPage() {
       />
       <div className="w-full max-w-md">
         <div className="mb-8 flex flex-col items-center text-center">
-          <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-lime-300 via-lime-400 to-lime-500 text-black shadow-glow">
+          <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-600 text-white shadow-glow">
             <GearIcon weight="fill" className="h-5 w-5" />
           </span>
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">

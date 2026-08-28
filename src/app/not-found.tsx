@@ -5,13 +5,13 @@ import { Button } from "@/components/ui/Button";
 export default function NotFound() {
   return (
     <section className="relative flex flex-1 items-center justify-center overflow-hidden px-6 py-24">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(153,234,72,0.09),transparent_38%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(16,185,129,0.09),transparent_38%)]" />
       <div className="relative mx-auto w-full max-w-xl text-center">
         <div className="font-mono text-[clamp(7rem,24vw,13rem)] font-bold leading-none tracking-[-0.12em] text-foreground/10 select-none">
           404
         </div>
         <div className="-mt-16 sm:-mt-24">
-          <span className="inline-flex items-center gap-2 rounded-full border border-lime-400/25 bg-lime-400/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-lime-300">
+          <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400">
             <CompassIcon weight="bold" className="h-3.5 w-3.5" />
             Off the trail
           </span>

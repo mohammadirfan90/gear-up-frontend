@@ -9,6 +9,11 @@ export interface OccupiedRange {
   endDate: string;
 }
 
+export interface GearAvailability {
+  dates: OccupiedRange[];
+  availableToday: number;
+}
+
 export interface CreateRentalPayload {
   gearItemId: string;
   startDate: string;
@@ -82,19 +87,17 @@ export interface RentalListParams {
 
 export const fetchOccupiedDates = async (
   gearItemId: string,
-): Promise<OccupiedRange[]> => {
+): Promise<GearAvailability> => {
   try {
     const response = await fetch(
       `${API_BASE_URL}/rentals/occupied/${gearItemId}`,
       { cache: "no-store" },
     );
-    if (!response.ok) return [];
-    const payload = (await response.json()) as ApiEnvelope<{
-      dates: OccupiedRange[];
-    }>;
-    return payload.data?.dates ?? [];
+    if (!response.ok) return { dates: [], availableToday: 0 };
+    const payload = (await response.json()) as ApiEnvelope<GearAvailability>;
+    return payload.data ?? { dates: [], availableToday: 0 };
   } catch {
-    return [];
+    return { dates: [], availableToday: 0 };
   }
 };
 
@@ -115,6 +118,21 @@ export const fetchMyRentals = async (
 export const fetchRentalOrder = async (orderId: string): Promise<RentalOrder> => {
   const { data } = await api.get<ApiEnvelope<{ order: RentalOrder }>>(
     `/rentals/${orderId}`,
+  );
+  return data.data.order;
+};
+
+/**
+ * Customer-side cancellation. The server only permits this while the order is
+ * unpaid (`placed` or `confirmed`) — once paid it requires a refund path.
+ */
+export const cancelRentalOrder = async (
+  orderId: string,
+  reason?: string,
+): Promise<RentalOrder> => {
+  const { data } = await api.patch<ApiEnvelope<{ order: RentalOrder }>>(
+    `/rentals/${orderId}/status`,
+    { status: "cancelled", reason },
   );
   return data.data.order;
 };

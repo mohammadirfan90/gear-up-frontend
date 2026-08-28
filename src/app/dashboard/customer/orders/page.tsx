@@ -44,7 +44,7 @@ export default function CustomerOrdersPage() {
     <DashboardShell
       eyebrow="Customer workspace"
       title="Orders"
-      description="Browse and manage every rental you've placed."
+      description=""
       tabs={tabs}
       actions={
         <Button asChild variant="secondary" size="sm">

@@ -19,6 +19,7 @@ import {
   WarningCircleIcon,
 } from "@phosphor-icons/react/dist/ssr";
 import toast from "react-hot-toast";
+import { getApiErrorMessage } from "@/shared/apiError";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/shared/utils/cn";
 import {
@@ -135,11 +136,11 @@ export function ProviderOrdersTable({ limit = 50 }: ProviderOrdersTableProps) {
       }
       return { previous };
     },
-    onError: (error: Error, _variables, context) => {
+    onError: (error: unknown, _variables, context) => {
       if (context?.previous) {
         queryClient.setQueryData(["provider-orders", limit], context.previous);
       }
-      toast.error(error.message || "Unable to update order status");
+      toast.error(getApiErrorMessage(error, "Unable to update order status"));
     },
     onSuccess: (order, variables) => {
       const label = ORDER_STATUS_LABELS[variables.target];
@@ -188,7 +189,7 @@ export function ProviderOrdersTable({ limit = 50 }: ProviderOrdersTableProps) {
                 className={cn(
                   "rounded-md px-1.5 py-0.5 text-[10px] font-semibold",
                   filter === key
-                    ? "bg-lime-400/20 text-lime-300"
+                    ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-300"
                     : "bg-secondary/60 text-muted-foreground",
                 )}
               >
@@ -214,7 +215,7 @@ export function ProviderOrdersTable({ limit = 50 }: ProviderOrdersTableProps) {
           <button
             type="button"
             onClick={() => ordersQuery.refetch()}
-            className="mt-3 text-[12px] font-medium text-lime-300 hover:text-lime-200"
+            className="mt-3 text-[12px] font-medium text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
           >
             Try again
           </button>
@@ -282,7 +283,7 @@ function OrderRow({
           <div className="flex items-center gap-2">
             <Link
               href={`/dashboard/provider/orders/${order.id}`}
-              className="truncate text-[13px] font-medium text-foreground hover:text-lime-300"
+              className="truncate text-[13px] font-medium text-foreground hover:text-emerald-500 dark:hover:text-emerald-400"
             >
               Order #{shortId}
             </Link>

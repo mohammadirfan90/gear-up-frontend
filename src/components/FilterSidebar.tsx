@@ -75,7 +75,7 @@ export function FilterSidebar({ categories }: FilterSidebarProps) {
     <aside className="sticky top-24 flex flex-col gap-6 self-start rounded-xl border border-border glass-strong p-5 shadow-elevated">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="flex h-7 w-7 items-center justify-center rounded-md bg-lime-400/10 text-lime-300">
+          <span className="flex h-7 w-7 items-center justify-center rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
             <TagIcon weight="duotone" className="h-4 w-4" />
           </span>
           <h2 className="text-[13px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
@@ -241,7 +241,7 @@ export function FilterSidebar({ categories }: FilterSidebarProps) {
                   className={cn(
                     "group flex items-center justify-between rounded-md border px-3 py-2 text-left text-[13px] transition-colors",
                     active
-                      ? "border-lime-400/40 bg-lime-400/5 text-foreground"
+                      ? "border-emerald-500/40 bg-emerald-500/10 text-foreground"
                       : "border-border bg-secondary/30 text-muted-foreground hover:bg-secondary/60 hover:text-foreground",
                   )}
                   aria-pressed={active}
@@ -251,7 +251,7 @@ export function FilterSidebar({ categories }: FilterSidebarProps) {
                       className={cn(
                         "flex h-4 w-4 items-center justify-center rounded-sm border transition-colors",
                         active
-                          ? "border-lime-400 bg-lime-400 text-black"
+                          ? "border-emerald-500 bg-emerald-500 text-white dark:text-slate-950"
                           : "border-border bg-background/40",
                       )}
                     >

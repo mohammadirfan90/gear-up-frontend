@@ -96,7 +96,7 @@ export function GearGrid() {
     <div className="relative flex flex-col gap-8">
       {query.isFetching ? (
         <div className="pointer-events-none absolute right-0 top-0 z-10 h-1 w-24 overflow-hidden rounded-full bg-secondary">
-          <div className="h-full w-1/2 animate-shimmer rounded-full bg-lime-400" />
+          <div className="h-full w-1/2 animate-shimmer rounded-full bg-emerald-400" />
         </div>
       ) : null}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">

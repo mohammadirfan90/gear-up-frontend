@@ -29,9 +29,19 @@ function ConfirmationContent({
     const query = new URLSearchParams();
     query.set("order", orderId);
     if (paymentIntent) query.set("intent", paymentIntent);
-    if (redirectStatus) query.set("redirect_status", redirectStatus);
 
     redirected.current = true;
+
+    // Stripe returns redirect_status = succeeded | pending | failed. Only the
+    // first two belong on the success page — routing a failure there showed
+    // the customer "Payment succeeded" for a payment that never happened.
+    if (redirectStatus === "failed") {
+      query.set("reason", "failed");
+      router.replace(`/payment/cancel?${query.toString()}`);
+      return;
+    }
+
+    if (redirectStatus) query.set("redirect_status", redirectStatus);
     router.replace(`/payment/success?${query.toString()}`);
   }, [params, orderId, router]);
 
@@ -39,7 +49,7 @@ function ConfirmationContent({
     <div className="container mx-auto flex min-h-[60vh] max-w-xl flex-col items-center justify-center px-6 py-16 text-center">
       <SpinnerGapIcon
         weight="bold"
-        className="h-8 w-8 animate-spin text-lime-400"
+        className="h-8 w-8 animate-spin text-emerald-500 dark:text-emerald-400"
       />
       <p className="mt-4 text-sm font-medium text-foreground">
         Finalising your payment…
@@ -72,7 +82,7 @@ export default function ConfirmationPage({ params }: ConfirmationPageProps) {
         <div className="container mx-auto flex min-h-[60vh] items-center justify-center">
           <SpinnerGapIcon
             weight="bold"
-            className="h-6 w-6 animate-spin text-lime-400"
+            className="h-6 w-6 animate-spin text-emerald-500 dark:text-emerald-400"
           />
         </div>
       }

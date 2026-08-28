@@ -120,7 +120,7 @@ const resolveIcon = (slug: string, name: string): Icon => {
 };
 
 const GRADIENTS = [
-  "from-lime-300/30 via-emerald-500/15 to-teal-700/20",
+  "from-emerald-300/30 via-teal-500/15 to-emerald-700/20",
   "from-amber-300/30 via-orange-500/15 to-rose-700/20",
   "from-sky-300/30 via-blue-500/15 to-indigo-700/20",
   "from-fuchsia-300/30 via-purple-500/15 to-pink-700/20",
@@ -184,26 +184,26 @@ export function CategoryCarousel({ categories }: CategoryCarouselProps) {
             <Link
               key={category.id}
               href={`/gear?category=${encodeURIComponent(category.slug)}`}
-              className="group relative flex min-h-[180px] w-[260px] shrink-0 snap-start flex-col justify-between overflow-hidden rounded-xl border border-border bg-card p-5 transition-all hover:-translate-y-0.5 hover:border-lime-400/30 hover:shadow-glow sm:w-[280px]"
+              className="group relative flex min-h-[180px] w-[260px] shrink-0 snap-start flex-col justify-between overflow-hidden rounded-xl border border-border bg-card p-5 transition-all hover:-translate-y-0.5 hover:border-emerald-500/40 hover:shadow-glow sm:w-[280px]"
             >
               <div
                 aria-hidden
                 className={cn(
-                  "absolute inset-0 -z-0 bg-gradient-to-br opacity-50 transition-opacity group-hover:opacity-80",
+                  "absolute inset-0 -z-0 bg-gradient-to-br opacity-30 transition-opacity group-hover:opacity-50 dark:opacity-50 dark:group-hover:opacity-80",
                   gradient,
                 )}
               />
               <div
                 aria-hidden
-                className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent"
+                className="absolute inset-x-0 bottom-0 h-1/2 dark:bg-gradient-to-t dark:from-black/60 dark:to-transparent"
               />
               <div
                 aria-hidden
-                className="absolute right-4 top-4 h-24 w-24 rounded-full bg-white/[0.04] blur-2xl transition-colors group-hover:bg-lime-400/10"
+                className="absolute right-4 top-4 h-24 w-24 rounded-full bg-emerald-500/[0.04] blur-2xl transition-colors group-hover:bg-emerald-500/10 dark:bg-white/[0.04] dark:group-hover:bg-emerald-400/10"
               />
 
               <div className="relative z-10 flex items-center justify-between">
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-black/40 text-lime-300 backdrop-blur">
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-emerald-500/20 bg-emerald-500/10 text-emerald-700 backdrop-blur dark:border-white/10 dark:bg-black/40 dark:text-emerald-400">
                   <Icon weight="duotone" className="h-4 w-4" />
                 </span>
                 <ArrowRightIcon
@@ -221,7 +221,7 @@ export function CategoryCarousel({ categories }: CategoryCarouselProps) {
                     {category.description}
                   </p>
                 ) : null}
-                <div className="mt-3 inline-flex items-center gap-1 text-[11px] font-medium text-lime-300 opacity-0 transition-opacity group-hover:opacity-100">
+                <div className="mt-3 inline-flex items-center gap-1 text-[11px] font-medium text-emerald-400 opacity-0 transition-opacity group-hover:opacity-100">
                   <SparkleIcon weight="fill" className="h-3 w-3" />
                   Explore
                 </div>

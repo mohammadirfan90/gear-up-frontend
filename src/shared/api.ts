@@ -8,6 +8,7 @@ import {
   removeTokenCookies,
   setTokenCookie,
 } from "./cookies";
+import { applyCsrfHeader } from "./csrf";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
@@ -51,6 +52,7 @@ const refreshAccessToken = async (): Promise<string | null> => {
       {
         headers: { "Content-Type": "application/json" },
         timeout: 15000,
+        withCredentials: true,
       },
     );
 
@@ -65,12 +67,15 @@ const refreshAccessToken = async (): Promise<string | null> => {
 };
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+  const headers = AxiosHeaders.from(config.headers);
   const accessToken = getTokenCookie();
   if (accessToken) {
-    const headers = AxiosHeaders.from(config.headers);
     headers.set("Authorization", `Bearer ${accessToken}`);
-    config.headers = headers;
   }
+  // Forward-compatible double-submit CSRF: attaches X-CSRF-Token only when
+  // the server has already set XSRF-TOKEN. No-ops harmlessly otherwise.
+  applyCsrfHeader(config.method, headers);
+  config.headers = headers;
   return config;
 });
 
@@ -84,8 +89,21 @@ api.interceptors.response.use(
     if (
       error.response?.status !== 401 ||
       !originalRequest ||
-      originalRequest._retry ||
-      originalRequest.url?.includes("/auth/refresh")
+      originalRequest._retry
+    ) {
+      return Promise.reject(error);
+    }
+
+    // Endpoints that must never trigger a refresh-and-retry. A 401 from any
+    // of these means the user's credentials are simply invalid or they are
+    // not logged in — retrying can't fix that, and we don't want the retry
+    // path (or a subsequent re-throw) to be mistaken for a missing route.
+    const url = originalRequest.url ?? "";
+    if (
+      url.includes("/auth/refresh") ||
+      url.includes("/auth/login") ||
+      url.includes("/auth/register") ||
+      url.includes("/auth/me")
     ) {
       return Promise.reject(error);
     }
@@ -100,10 +118,17 @@ api.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    const headers = AxiosHeaders.from(originalRequest.headers);
+    // Build a clean retry config so the method and body cannot be lost
+    // when axios re-serializes the config object.
+    const retryConfig: InternalAxiosRequestConfig = {
+      ...originalRequest,
+      method: (originalRequest.method ?? "get").toLowerCase() as InternalAxiosRequestConfig["method"],
+      headers: AxiosHeaders.from(originalRequest.headers),
+    };
+    const headers = AxiosHeaders.from(retryConfig.headers);
     headers.set("Authorization", `Bearer ${accessToken}`);
-    originalRequest.headers = headers;
-    return api(originalRequest);
+    retryConfig.headers = headers;
+    return api.request(retryConfig);
   },
 );
 

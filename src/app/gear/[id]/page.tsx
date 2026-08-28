@@ -109,7 +109,7 @@ function DetailView({ gear, reviews }: { gear: GearDetail; reviews: GearReview[]
   const specifications = gear.specifications
     ? Object.entries(gear.specifications).filter(([, value]) => value !== null && value !== "")
     : [];
-  const average = gear.avgRating ?? 0;
+  const average = Number(gear.avgRating ?? 0);
 
   return (
     <div className="container mx-auto max-w-7xl px-6 py-10 sm:py-14">
@@ -126,14 +126,14 @@ function DetailView({ gear, reviews }: { gear: GearDetail; reviews: GearReview[]
           <GearGallery images={gear.images} name={gear.name} />
           <div className="mt-10">
             <div className="mb-5 flex flex-wrap items-center gap-2">
-              <span className="rounded-md border border-lime-400/30 bg-lime-400/5 px-2.5 py-1 text-[11px] font-medium text-lime-300">
+              <span className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
                 {gear.category.name}
               </span>
               <span className="rounded-md border border-border bg-secondary/40 px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
                 {gear.brand}
               </span>
               {gear.isAvailable ? (
-                <span className="inline-flex items-center gap-1 rounded-md border border-emerald-400/20 bg-emerald-400/5 px-2.5 py-1 text-[11px] font-medium text-emerald-300">
+                <span className="inline-flex items-center gap-1 rounded-md border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
                   <CheckCircleIcon weight="fill" className="h-3 w-3" />
                   In stock
                 </span>
@@ -147,13 +147,16 @@ function DetailView({ gear, reviews }: { gear: GearDetail; reviews: GearReview[]
 
           <section className="mt-12 border-t border-border pt-8">
             <div className="mb-6 flex items-center gap-3">
-              <PackageIcon weight="duotone" className="h-5 w-5 text-lime-400" />
+              <PackageIcon weight="duotone" className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
               <h2 className="text-xl font-semibold tracking-tight text-foreground">Specifications</h2>
             </div>
             {specifications.length > 0 ? (
-              <dl className="grid grid-cols-1 overflow-hidden rounded-lg border border-border sm:grid-cols-2">
+              <dl className="grid grid-cols-1 overflow-hidden rounded-lg border border-border">
                 {specifications.map(([key, value]) => (
-                  <div key={key} className="flex items-center justify-between gap-4 border-b border-border bg-card/50 px-4 py-3.5 text-[13px] last:border-b-0 sm:nth-[odd]:border-r">
+                  <div
+                    key={key}
+                    className="flex items-center justify-between gap-4 border-b border-border bg-card/50 px-4 py-3.5 text-[13px] last:border-b-0"
+                  >
                     <dt className="text-muted-foreground">{humanizeKey(key)}</dt>
                     <dd className="text-right font-medium text-foreground">
                       {typeof value === "object" ? JSON.stringify(value) : String(value)}
@@ -216,7 +219,7 @@ function DetailView({ gear, reviews }: { gear: GearDetail; reviews: GearReview[]
               <div className="min-w-0">
                 <p className="text-[11px] uppercase tracking-[0.15em] text-muted-foreground">Listed by</p>
                 <p className="mt-1 truncate text-sm font-medium text-foreground">{gear.provider.name}</p>
-                <p className="mt-1 inline-flex items-center gap-1 text-[11px] text-lime-300">
+                <p className="mt-1 inline-flex items-center gap-1 text-[11px] text-emerald-600 dark:text-emerald-400">
                   <CheckCircleIcon weight="fill" className="h-3 w-3" />
                   Verified provider
                 </p>

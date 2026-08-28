@@ -24,7 +24,22 @@ import { fetchRentalOrder, type RentalOrder } from "@/shared/rentals";
 import { ORDER_STATUS_LABELS, ORDER_STATUS_TONE } from "@/shared/order";
 import { cn } from "@/shared/utils/cn";
 
+/** Stop polling after ~90s rather than hammering the API forever. */
+const MAX_POLL_ATTEMPTS = 30;
+const POLL_INTERVAL_MS = 3000;
+
 const REDIRECT_STATUS_COPY: Record<string, { tone: string; label: string; message: string }> = {
+  failed: {
+    tone: "text-destructive",
+    label: "Payment failed",
+    message:
+      "Stripe could not complete this payment. Nothing was charged — you can retry from the order page.",
+  },
+  pending: {
+    tone: "text-amber-300",
+    label: "Payment pending",
+    message: "Stripe is still finalising your payment. Hang tight while we sync the order.",
+  },
   succeeded: {
     tone: "text-emerald-300",
     label: "Payment succeeded",
@@ -56,13 +71,24 @@ function PaymentSuccessContent() {
   const statusMeta =
     REDIRECT_STATUS_COPY[redirectStatus] ?? REDIRECT_STATUS_COPY.succeeded;
 
+  const [pollAttempts, setPollAttempts] = useState(0);
+
   const orderQuery = useQuery({
     queryKey: ["rental-order-after-payment", orderId],
-    queryFn: () => fetchRentalOrder(orderId),
+    queryFn: async () => {
+      const result = await fetchRentalOrder(orderId);
+      setPollAttempts((attempts) => attempts + 1);
+      return result;
+    },
     enabled: Boolean(orderId),
     refetchInterval: (query) => {
       const status = query.state.data?.status;
-      return status === "paid" || status === "picked_up" ? false : 3000;
+      if (status === "paid" || status === "picked_up" || status === "returned") {
+        return false;
+      }
+      // Bounded: an unconfigured or unreachable webhook would otherwise leave
+      // this page polling indefinitely.
+      return pollAttempts >= MAX_POLL_ATTEMPTS ? false : POLL_INTERVAL_MS;
     },
   });
 
@@ -70,6 +96,8 @@ function PaymentSuccessContent() {
   const isSucceeded =
     order?.status === "paid" || order?.status === "picked_up" || order?.status === "returned";
   const isConfirmed = Boolean(isSucceeded);
+  const pollExhausted =
+    Boolean(order) && !isSucceeded && pollAttempts >= MAX_POLL_ATTEMPTS;
 
   const totalAmount = Number(order?.totalAmount ?? 0);
   const itemCount = useMemo(
@@ -115,6 +143,37 @@ function PaymentSuccessContent() {
             ? "Your payment has been captured by Stripe. The provider will be notified to prepare your gear for pickup."
             : statusMeta.message}
         </p>
+
+        {pollExhausted ? (
+          <div className="mt-6 flex w-full max-w-xl items-start gap-3 rounded-lg border border-amber-400/30 bg-amber-500/5 px-4 py-3 text-left">
+            <ClockCountdownIcon
+              weight="duotone"
+              className="mt-0.5 h-4 w-4 shrink-0 text-amber-300"
+            />
+            <div>
+              <p className="text-[13px] font-medium text-foreground">
+                Still waiting on confirmation
+              </p>
+              <p className="mt-1 text-[12px] leading-5 text-muted-foreground">
+                Your card may already have been charged. Open the order to
+                re-check its status, and quote order{" "}
+                <span className="font-mono">#{orderShortId || "—"}</span> if you
+                need to contact support.
+              </p>
+              <Button
+                size="sm"
+                variant="outline"
+                className="mt-3"
+                onClick={() => {
+                  setPollAttempts(0);
+                  void orderQuery.refetch();
+                }}
+              >
+                Check again
+              </Button>
+            </div>
+          </div>
+        ) : null}
       </div>
 
       <div className="mt-12 grid w-full grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
@@ -155,7 +214,7 @@ function PaymentSuccessContent() {
       </div>
 
       <div className="mt-6 flex items-center gap-2 text-[11px] text-muted-foreground print:hidden">
-        <ShieldCheckIcon weight="duotone" className="h-3.5 w-3.5 text-lime-400" />
+        <ShieldCheckIcon weight="duotone" className="h-3.5 w-3.5 text-emerald-500 dark:text-emerald-400" />
         Secured by Stripe · Funds held until pickup confirmation
       </div>
     </div>
@@ -189,7 +248,7 @@ function SuccessAnimation({ confirmed }: { confirmed: boolean }) {
       />
       <span
         className={cn(
-          "relative flex h-16 w-16 items-center justify-center rounded-full border border-emerald-400/40 bg-emerald-500/15 text-emerald-300 shadow-glow transition-all delay-300 duration-500",
+          "relative flex h-16 w-16 items-center justify-center rounded-full border border-emerald-400/40 bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 shadow-glow transition-all delay-300 duration-500",
           shown ? "scale-100 opacity-100" : "scale-90 opacity-0",
         )}
       >
@@ -241,7 +300,7 @@ function ReceiptCard({
     <section className="overflow-hidden rounded-2xl border border-border bg-card/60">
       <header className="flex items-center justify-between border-b border-border bg-secondary/30 px-6 py-4">
         <div className="flex items-center gap-3">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-lime-400/30 bg-lime-400/10 text-lime-300">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
             <ReceiptIcon weight="duotone" className="h-4 w-4" />
           </span>
           <div>
@@ -391,19 +450,19 @@ function NextStepsCard({ orderId }: { orderId: string }) {
         <h3 className="text-sm font-semibold text-foreground">What happens next</h3>
         <ol className="mt-4 space-y-3 text-[12px] text-muted-foreground">
           <li className="flex items-start gap-2">
-            <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-lime-400/30 bg-lime-400/10 text-[10px] font-semibold text-lime-300">
+            <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-emerald-500/30 bg-emerald-500/10 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
               1
             </span>
             Stripe confirms payment and notifies GearUp.
           </li>
           <li className="flex items-start gap-2">
-            <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-lime-400/30 bg-lime-400/10 text-[10px] font-semibold text-lime-300">
+            <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-emerald-500/30 bg-emerald-500/10 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
               2
             </span>
             The provider prepares your gear for the agreed pickup day.
           </li>
           <li className="flex items-start gap-2">
-            <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-lime-400/30 bg-lime-400/10 text-[10px] font-semibold text-lime-300">
+            <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md border border-emerald-500/30 bg-emerald-500/10 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
               3
             </span>
             Once returned, leave a review from the order page.
@@ -434,7 +493,7 @@ export default function PaymentSuccessPage() {
         <div className="container mx-auto flex min-h-[70vh] max-w-3xl flex-col items-center justify-center px-6 py-16">
           <SpinnerGapIcon
             weight="bold"
-            className="h-6 w-6 animate-spin text-lime-400"
+            className="h-6 w-6 animate-spin text-emerald-500 dark:text-emerald-400"
           />
         </div>
       }

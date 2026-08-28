@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { requireUser } from "@/shared/serverAuth";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -10,10 +11,15 @@ export const metadata: Metadata = {
   },
 };
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  // Source-of-truth auth gate for the entire /dashboard segment. Per-role
+  // layouts (customer/provider/admin) layer a stricter role check on top.
+  // Running here ensures even future top-level dashboard routes cannot
+  // accidentally bypass authentication.
+  await requireUser("/dashboard");
+  return <>{children}</>;
 }

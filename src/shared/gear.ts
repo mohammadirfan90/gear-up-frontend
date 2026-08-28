@@ -9,6 +9,7 @@ export interface GearSummary {
   stock: number;
   isAvailable: boolean;
   images: string[];
+  specifications?: Record<string, unknown> | null;
   category: {
     id: string;
     name: string;

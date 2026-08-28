@@ -95,7 +95,7 @@ export default function RegisterPage() {
       />
       <div className="w-full max-w-lg">
         <div className="mb-8 flex flex-col items-center text-center">
-          <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-lime-300 via-lime-400 to-lime-500 text-black shadow-glow">
+          <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-600 text-white shadow-glow">
             <GearIcon weight="fill" className="h-5 w-5" />
           </span>
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">
@@ -122,7 +122,7 @@ export default function RegisterPage() {
                   className={cn(
                     "group relative flex flex-col items-start gap-2 rounded-lg border p-4 text-left transition-colors",
                     active
-                      ? "border-lime-400/60 bg-lime-400/5 shadow-glow"
+                      ? "border-emerald-500/60 bg-emerald-500/10 shadow-glow"
                       : "border-border bg-secondary/30 hover:border-border/80 hover:bg-secondary/60",
                   )}
                   aria-pressed={active}
@@ -131,7 +131,7 @@ export default function RegisterPage() {
                     className={cn(
                       "flex h-8 w-8 items-center justify-center rounded-md transition-colors",
                       active
-                        ? "bg-lime-400/20 text-lime-300"
+                        ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
                         : "bg-secondary text-muted-foreground",
                     )}
                   >
@@ -144,7 +144,7 @@ export default function RegisterPage() {
                   {active ? (
                     <CheckCircleIcon
                       weight="fill"
-                      className="absolute right-3 top-3 h-4 w-4 text-lime-400"
+                      className="absolute right-3 top-3 h-4 w-4 text-emerald-500 dark:text-emerald-400"
                     />
                   ) : null}
                 </button>
@@ -213,7 +213,7 @@ export default function RegisterPage() {
                     className={cn(
                       "flex items-center gap-1.5 rounded-md border px-2 py-1 transition-colors",
                       check.passed
-                        ? "border-lime-400/30 bg-lime-400/5 text-lime-300"
+                        ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                         : "border-border bg-secondary/30 text-muted-foreground",
                     )}
                   >
@@ -221,7 +221,7 @@ export default function RegisterPage() {
                       weight="fill"
                       className={cn(
                         "h-3 w-3",
-                        check.passed ? "text-lime-400" : "text-muted-foreground",
+                        check.passed ? "text-emerald-500 dark:text-emerald-400" : "text-muted-foreground",
                       )}
                     />
                     {check.label}

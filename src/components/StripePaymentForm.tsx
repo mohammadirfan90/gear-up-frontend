@@ -9,6 +9,7 @@ import {
   useElements,
   useStripe,
 } from "@stripe/react-stripe-js";
+import { useTheme } from "next-themes";
 import toast from "react-hot-toast";
 import {
   CheckCircleIcon,
@@ -19,7 +20,8 @@ import {
 } from "@phosphor-icons/react/dist/ssr";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/shared/utils/cn";
-import { createPaymentIntent } from "@/shared/paymentClient";
+import { createPaymentIntent, syncPaymentStatus } from "@/shared/paymentClient";
+import { getApiErrorMessage } from "@/shared/apiError";
 
 const STRIPE_PUBLISHABLE_KEY =
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? "";
@@ -36,7 +38,7 @@ interface StripePaymentFormProps {
   onSuccess?: () => void;
 }
 
-const appearance = {
+const DARK_APPEARANCE = {
   theme: "night" as const,
   variables: {
     colorPrimary: "#99ea48",
@@ -77,6 +79,47 @@ const appearance = {
   },
 };
 
+const LIGHT_APPEARANCE = {
+  theme: "stripe" as const,
+  variables: {
+    colorPrimary: "#487f17",
+    colorBackground: "#ffffff",
+    colorText: "#0a0a0a",
+    colorDanger: "#dc2626",
+    colorTextSecondary: "#52525b",
+    colorTextPlaceholder: "#a1a1aa",
+    borderRadius: "10px",
+    fontFamily: "Inter, system-ui, sans-serif",
+    spacingUnit: "4px",
+  },
+  rules: {
+    ".Input": {
+      border: "1px solid #e4e4e7",
+      backgroundColor: "#fafafa",
+    },
+    ".Input:focus": {
+      borderColor: "#487f17",
+      boxShadow: "0 0 0 1px #487f17",
+    },
+    ".Label": {
+      color: "#52525b",
+      fontWeight: "500",
+      fontSize: "12px",
+      letterSpacing: "0.05em",
+      textTransform: "uppercase",
+    },
+    ".Tab": {
+      backgroundColor: "#fafafa",
+      border: "1px solid #e4e4e7",
+    },
+    ".Tab--selected": {
+      backgroundColor: "#f4f4f5",
+      borderColor: "#487f17",
+      color: "#0a0a0a",
+    },
+  },
+};
+
 export function StripePaymentForm({
   rentalOrderId,
   amount,
@@ -85,9 +128,11 @@ export function StripePaymentForm({
   onSuccess,
 }: StripePaymentFormProps) {
   const router = useRouter();
+  const { resolvedTheme } = useTheme();
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [paymentId, setPaymentId] = useState<string | null>(null);
   const [intentError, setIntentError] = useState<string | null>(null);
+  const appearance = resolvedTheme === "light" ? LIGHT_APPEARANCE : DARK_APPEARANCE;
 
   useEffect(() => {
     let cancelled = false;
@@ -110,11 +155,12 @@ export function StripePaymentForm({
       })
       .catch((error: unknown) => {
         if (cancelled) return;
-        const message =
-          error instanceof Error
-            ? error.message
-            : "Unable to initialize payment. Please try again.";
-        setIntentError(message);
+        setIntentError(
+          getApiErrorMessage(
+            error,
+            "Unable to initialize payment. Please try again.",
+          ),
+        );
       });
 
     return () => {
@@ -159,7 +205,7 @@ export function StripePaymentForm({
       <div className="space-y-4 rounded-xl border border-border bg-card/60 p-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-[13px] font-medium text-muted-foreground">
-            <SpinnerGapIcon weight="bold" className="h-4 w-4 animate-spin text-lime-400" />
+            <SpinnerGapIcon weight="bold" className="h-4 w-4 animate-spin text-emerald-500 dark:text-emerald-400" />
             Preparing secure checkout…
           </div>
           <span className="text-[11px] text-muted-foreground">Order #{orderShortId}</span>
@@ -172,6 +218,7 @@ export function StripePaymentForm({
 
   return (
     <Elements
+      key={resolvedTheme ?? "dark"}
       stripe={stripePromise}
       options={{
         clientSecret,
@@ -180,6 +227,7 @@ export function StripePaymentForm({
       }}
     >
       <CheckoutInner
+        key={clientSecret}
         rentalOrderId={rentalOrderId}
         paymentId={paymentId}
         amount={amount}
@@ -194,6 +242,7 @@ export function StripePaymentForm({
 
 function CheckoutInner({
   rentalOrderId,
+  paymentId,
   amount,
   currency,
   orderShortId,
@@ -212,6 +261,7 @@ function CheckoutInner({
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [elementReady, setElementReady] = useState(false);
 
   const formattedAmount = useMemo(
     () =>
@@ -224,50 +274,115 @@ function CheckoutInner({
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!stripe || !elements) return;
+    if (!stripe || !elements || !elementReady) return;
 
     setIsProcessing(true);
     setErrorMessage(null);
 
-    const { error, paymentIntent } = await stripe.confirmPayment({
-      elements,
-      redirect: "if_required",
-      confirmParams: {
-        return_url: `${window.location.origin}/dashboard/customer/orders/${rentalOrderId}/confirmation`,
-      },
-    });
+    try {
+      const { error, paymentIntent } = await stripe.confirmPayment({
+        elements,
+        redirect: "if_required",
+        confirmParams: {
+          return_url: `${window.location.origin}/dashboard/customer/orders/${rentalOrderId}/confirmation`,
+        },
+      });
 
-    if (error) {
-      const message =
-        error.type === "card_error" || error.type === "validation_error"
-          ? error.message ?? "Your payment could not be completed."
-          : "An unexpected error occurred while processing your payment.";
-      setErrorMessage(message);
-      toast.error(message);
-      setIsProcessing(false);
-      return;
-    }
+      if (error) {
+        const message =
+          error.type === "card_error" || error.type === "validation_error"
+            ? error.message ?? "Your payment could not be completed."
+            : "An unexpected error occurred while processing your payment.";
+        setErrorMessage(message);
+        toast.error(message);
+        setIsProcessing(false);
+        // Send declines and abandoned confirmations to the cancel page so the
+        // customer gets the retry path rather than a success screen.
+        router.push(
+          `/payment/cancel?order=${rentalOrderId}&reason=${
+            error.type === "card_error" ? "failed" : "requires_payment_method"
+          }`,
+        );
+        return;
+      }
 
-    if (paymentIntent) {
+      if (!paymentIntent) {
+        // No error and no intent means Stripe handed the flow off to a
+        // redirect; the return_url takes over from here.
+        return;
+      }
+
+      // A PaymentIntent comes back for `processing` and `requires_*` states
+      // too — only `succeeded` means the money actually moved.
+      if (paymentIntent.status !== "succeeded") {
+        if (paymentIntent.status === "processing") {
+          toast.success("Payment submitted — awaiting confirmation");
+          onSuccess?.();
+          router.push(
+            `/payment/success?order=${rentalOrderId}&intent=${paymentIntent.id}&redirect_status=processing`,
+          );
+          return;
+        }
+
+        const message =
+          "Your payment needs another step before it can be completed.";
+        setErrorMessage(message);
+        toast.error(message);
+        setIsProcessing(false);
+        router.push(
+          `/payment/cancel?order=${rentalOrderId}&reason=requires_payment_method`,
+        );
+        return;
+      }
+
+      // The webhook is what flips the order to `paid`, but it can lag or be
+      // unconfigured. Nudge the server to reconcile against Stripe now so the
+      // success page doesn't poll a status that never changes.
+      if (paymentId) {
+        try {
+          await syncPaymentStatus(paymentId);
+        } catch {
+          // Non-fatal — the success page keeps polling and the webhook will
+          // settle it either way.
+        }
+      }
+
       toast.success("Payment confirmed");
       onSuccess?.();
       router.push(`/payment/success?order=${rentalOrderId}&intent=${paymentIntent.id}`);
+    } catch (err) {
+      const message = getApiErrorMessage(
+        err,
+        "An unexpected error occurred while processing your payment.",
+      );
+      setErrorMessage(message);
+      toast.error(message);
+      setIsProcessing(false);
     }
   };
 
-  const canSubmit = Boolean(stripe && elements) && !isProcessing;
+  const canSubmit = Boolean(stripe && elements && elementReady) && !isProcessing;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="rounded-xl border border-border bg-card/60 p-5">
         <div className="mb-4 flex items-center justify-between text-[13px] text-muted-foreground">
           <span className="inline-flex items-center gap-1.5">
-            <LockKeyIcon weight="duotone" className="h-4 w-4 text-lime-400" />
+            <LockKeyIcon weight="duotone" className="h-4 w-4 text-emerald-500 dark:text-emerald-400" />
             Encrypted and processed by Stripe
           </span>
           <span>Order #{orderShortId}</span>
         </div>
-        <PaymentElement options={{ layout: "tabs" }} />
+        <PaymentElement
+          options={{ layout: "tabs" }}
+          onReady={() => setElementReady(true)}
+          onChange={(event) => {
+            // Stripe can flip element back to incomplete on validation errors;
+            // gate submit on elementReady *and* the event's complete state so
+            // we never submit with an empty card field.
+            if (event.complete) setElementReady(true);
+          }}
+        />
       </div>
 
       {errorMessage ? (
@@ -288,6 +403,11 @@ function CheckoutInner({
             <SpinnerGapIcon weight="bold" className="h-4 w-4 animate-spin" />
             Processing payment…
           </>
+        ) : !elementReady ? (
+          <>
+            <SpinnerGapIcon weight="bold" className="h-4 w-4 animate-spin" />
+            Loading secure checkout…
+          </>
         ) : (
           <>
             <CreditCardIcon weight="bold" className="h-4 w-4" />
@@ -298,11 +418,11 @@ function CheckoutInner({
 
       <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[11px] text-muted-foreground">
         <span className="inline-flex items-center gap-1">
-          <CheckCircleIcon weight="fill" className="h-3 w-3 text-emerald-300" />
+          <CheckCircleIcon weight="fill" className="h-3 w-3 text-emerald-400" />
           Funds held until pickup
         </span>
         <span className="inline-flex items-center gap-1">
-          <LockKeyIcon weight="fill" className="h-3 w-3 text-lime-300" />
+          <LockKeyIcon weight="fill" className="h-3 w-3 text-emerald-400" />
           PCI-DSS compliant
         </span>
       </div>

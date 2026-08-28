@@ -17,6 +17,7 @@ import {
 } from "@phosphor-icons/react/dist/ssr";
 import { useAuthStore, type UserRole } from "@/store/authStore";
 import { cn } from "@/shared/utils/cn";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface NavLink {
   href: string;
@@ -37,15 +38,12 @@ const ROLE_LINKS: Record<UserRole, NavLink[]> = {
   provider: [
     { href: "/", label: "Home" },
     { href: "/gear", label: "Browse Gear" },
-    { href: "/dashboard/provider", label: "Overview" },
-    { href: "/dashboard/provider/orders", label: "Orders" },
+    { href: "/dashboard/provider", label: "Workspace" },
   ],
   admin: [
     { href: "/", label: "Home" },
     { href: "/gear", label: "Browse Gear" },
-    { href: "/dashboard/admin", label: "Overview" },
-    { href: "/dashboard/admin/users", label: "Users" },
-    { href: "/dashboard/admin/rentals", label: "Rentals" },
+    { href: "/dashboard/admin", label: "Workspace" },
   ],
 };
 
@@ -61,9 +59,9 @@ const roleIcon = (role: UserRole) => {
 };
 
 const roleAccent: Record<UserRole, string> = {
-  customer: "text-lime-400",
-  provider: "text-lime-400",
-  admin: "text-lime-400",
+  customer: "text-emerald-600 dark:text-emerald-400",
+  provider: "text-emerald-600 dark:text-emerald-400",
+  admin: "text-emerald-600 dark:text-emerald-400",
 };
 
 export function Navbar() {
@@ -117,22 +115,35 @@ export function Navbar() {
         .toUpperCase()
     : "GU";
 
+  const isHomeHero = pathname === "/" && !scrolled;
+
   return (
     <header
       className={cn(
         "sticky top-0 z-50 w-full border-b transition-all duration-300",
         scrolled
           ? "border-border glass-strong shadow-elevated"
-          : "border-transparent bg-transparent",
+          : isHomeHero
+            ? "border-white/10 bg-black/40 backdrop-blur-md"
+            : "border-border bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60",
       )}
     >
       <div className="container mx-auto flex h-16 items-center justify-between px-6">
         <Link
           href="/"
-          className="group flex items-center gap-2 text-sm font-semibold tracking-tight text-foreground"
+          className={cn(
+            "group flex items-center gap-2 text-sm font-semibold tracking-tight transition-colors",
+            isHomeHero ? "text-white" : "text-foreground",
+          )}
         >
-          <span className="relative flex h-8 w-8 items-center justify-center rounded-md bg-gradient-to-br from-lime-300 via-lime-400 to-lime-600 text-black shadow-glow">
-            <GearIcon weight="fill" className="h-4 w-4" />
+          <span className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-md bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-600 shadow-glow">
+            <img
+              src="/gear.avif"
+              alt="GearUp logo"
+              width={32}
+              height={32}
+              className="h-full w-full object-cover"
+            />
           </span>
           <span className="text-[15px]">GearUp</span>
         </Link>
@@ -150,14 +161,18 @@ export function Navbar() {
                 className={cn(
                   "group relative px-3 py-2 text-[13px] font-medium transition-colors",
                   active
-                    ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground",
+                    ? isHomeHero
+                      ? "text-white"
+                      : "text-foreground"
+                    : isHomeHero
+                      ? "text-white/80 hover:text-white"
+                      : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 {link.label}
                 <span
                   className={cn(
-                    "absolute inset-x-3 -bottom-px h-px origin-left scale-x-0 bg-gradient-to-r from-lime-300 via-lime-400 to-lime-600 transition-transform duration-300",
+                    "absolute inset-x-3 -bottom-px h-px origin-left scale-x-0 bg-gradient-to-r from-emerald-400 via-emerald-500 to-teal-600 transition-transform duration-300",
                     active && "scale-x-100",
                     "group-hover:scale-x-100",
                   )}
@@ -168,6 +183,7 @@ export function Navbar() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
+          <ThemeToggle className={cn("h-9 w-9 rounded-md", isHomeHero && "border-white/15 bg-black/40 text-white hover:bg-black/60")} />
           {isInitializing ? (
             <div className="h-9 w-32 animate-shimmer rounded-md" />
           ) : isAuthenticated && user ? (
@@ -175,23 +191,29 @@ export function Navbar() {
               <button
                 type="button"
                 onClick={() => setMenuOpen((prev) => !prev)}
-                className="flex items-center gap-2 rounded-md border border-border bg-secondary/50 px-2.5 py-1.5 text-sm transition-colors hover:bg-secondary"
+                className={cn(
+                  "flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-sm transition-colors",
+                  isHomeHero
+                    ? "border-white/15 bg-black/40 text-white backdrop-blur hover:bg-black/60"
+                    : "border-border bg-secondary/50 text-foreground hover:bg-secondary",
+                )}
               >
-                <span className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-lime-300 via-lime-400 to-lime-600 text-[11px] font-semibold text-black">
+                <span className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-600 text-[11px] font-semibold text-white">
                   {initials}
                 </span>
                 <span className="flex flex-col items-start leading-tight">
-                  <span className="text-[12px] font-medium text-foreground">
+                  <span className={cn("text-[12px] font-medium", isHomeHero ? "text-white" : "text-foreground")}>
                     {user.name}
                   </span>
-                  <span className={cn("text-[10px] uppercase tracking-wider", roleAccent[user.role])}>
+                  <span className={cn("text-[10px] uppercase tracking-wider", isHomeHero ? "text-emerald-400" : roleAccent[user.role])}>
                     {user.role}
                   </span>
                 </span>
                 <CaretDownIcon
                   weight="bold"
                   className={cn(
-                    "h-3.5 w-3.5 text-muted-foreground transition-transform",
+                    "h-3.5 w-3.5 transition-transform",
+                    isHomeHero ? "text-white/70" : "text-muted-foreground",
                     menuOpen && "rotate-180",
                   )}
                 />
@@ -246,14 +268,19 @@ export function Navbar() {
             <>
               <Link
                 href="/auth/login"
-                className="inline-flex items-center gap-2 rounded-md border border-border bg-secondary/40 px-3.5 py-1.5 text-[13px] font-medium text-foreground transition-colors hover:bg-secondary"
+                className={cn(
+                  "inline-flex items-center gap-2 rounded-md border px-3.5 py-1.5 text-[13px] font-medium transition-colors",
+                  isHomeHero
+                    ? "border-white/20 bg-black/40 text-white backdrop-blur hover:bg-black/60"
+                    : "border-border bg-secondary/40 text-foreground hover:bg-secondary",
+                )}
               >
                 <SignInIcon weight="bold" className="h-3.5 w-3.5" />
                 Sign in
               </Link>
               <Link
                 href="/auth/register"
-                className="inline-flex items-center gap-1.5 rounded-md bg-gradient-to-br from-lime-300 via-lime-400 to-lime-500 px-3.5 py-1.5 text-[13px] font-semibold text-black shadow-glow transition-transform hover:scale-[1.02]"
+                className="inline-flex items-center gap-1.5 rounded-md bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-700 px-3.5 py-1.5 text-[13px] font-semibold text-white shadow-glow transition-transform hover:scale-[1.02] dark:from-emerald-400 dark:via-emerald-500 dark:to-teal-600 dark:text-slate-950"
               >
                 Get started
               </Link>
@@ -261,14 +288,22 @@ export function Navbar() {
           )}
         </div>
 
-        <button
-          type="button"
-          onClick={() => setMobileOpen((prev) => !prev)}
-          className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border bg-secondary/40 text-foreground md:hidden"
-          aria-label="Toggle navigation"
-        >
-          <ListIcon weight="bold" className="h-4 w-4" />
-        </button>
+        <div className="flex items-center gap-2 md:hidden">
+          <ThemeToggle className={cn("h-9 w-9 rounded-md", isHomeHero && "border-white/15 bg-black/40 text-white hover:bg-black/60")} />
+          <button
+            type="button"
+            onClick={() => setMobileOpen((prev) => !prev)}
+            className={cn(
+              "inline-flex h-9 w-9 items-center justify-center rounded-md border text-foreground",
+              isHomeHero
+                ? "border-white/20 bg-black/40 text-white"
+                : "border-border bg-secondary/40 text-foreground",
+            )}
+            aria-label="Toggle navigation"
+          >
+            <ListIcon weight="bold" className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       {mobileOpen && (
@@ -315,7 +350,7 @@ export function Navbar() {
                 </Link>
                 <Link
                   href="/auth/register"
-                  className="flex items-center justify-center rounded-md bg-gradient-to-br from-lime-300 via-lime-400 to-lime-500 px-3 py-2 text-sm font-semibold text-black"
+                  className="flex items-center justify-center rounded-md bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-700 px-3 py-2 text-sm font-semibold text-white dark:from-emerald-400 dark:via-emerald-500 dark:to-teal-600 dark:text-slate-950"
                 >
                   Get started
                 </Link>

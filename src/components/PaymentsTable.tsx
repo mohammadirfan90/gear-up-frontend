@@ -154,7 +154,7 @@ export function PaymentsTable({ initialData, limit = 50 }: PaymentsTableProps) {
                   className={cn(
                     "rounded-md px-1.5 py-0.5 text-[10px] font-semibold",
                     filter === key
-                      ? "bg-lime-400/20 text-lime-300"
+                      ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-300"
                       : "bg-secondary/60 text-muted-foreground",
                   )}
                 >
@@ -178,7 +178,7 @@ export function PaymentsTable({ initialData, limit = 50 }: PaymentsTableProps) {
             <button
               type="button"
               onClick={() => paymentsQuery.refetch()}
-              className="mt-3 text-[12px] font-medium text-lime-300 hover:text-lime-200"
+              className="mt-3 text-[12px] font-medium text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
             >
               Try again
             </button>

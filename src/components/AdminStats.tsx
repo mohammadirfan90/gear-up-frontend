@@ -41,8 +41,8 @@ function Sparkline({ points, tone, className }: SparklineProps) {
   const gradientId = `sparkline-${tone}-${points.join("-")}`;
 
   const stroke = {
-    lime: "#a3e635",
-    emerald: "#34d399",
+    lime: "#10b981",
+    emerald: "#10b981",
     blue: "#60a5fa",
     amber: "#fbbf24",
     rose: "#fb7185",
@@ -128,8 +128,8 @@ function MetricCard({ label, value, hint, trend, tone, icon: Icon, trendFormat, 
   const isNegative = trendMeta?.direction === "down";
 
   const toneClass = {
-    lime: "text-lime-300 bg-lime-400/10 border-lime-400/20",
-    emerald: "text-emerald-300 bg-emerald-400/10 border-emerald-400/20",
+    lime: "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
+    emerald: "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
     blue: "text-blue-300 bg-blue-400/10 border-blue-400/20",
     amber: "text-amber-300 bg-amber-400/10 border-amber-400/20",
     rose: "text-rose-300 bg-rose-400/10 border-rose-400/20",
@@ -137,7 +137,7 @@ function MetricCard({ label, value, hint, trend, tone, icon: Icon, trendFormat, 
   }[tone];
 
   return (
-    <article className="group relative overflow-hidden rounded-xl border border-border bg-card/60 p-5 shadow-elevated transition-colors hover:border-lime-400/20">
+    <article className="group relative overflow-hidden rounded-xl border border-border bg-card/60 p-5 shadow-elevated transition-colors hover:border-emerald-500/30">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
@@ -181,7 +181,7 @@ function MetricCard({ label, value, hint, trend, tone, icon: Icon, trendFormat, 
           ) : null}
         </div>
       ) : null}
-      <div className="absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 bg-gradient-to-r from-lime-300 to-transparent transition-transform duration-300 group-hover:scale-x-100" />
+      <div className="absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 bg-gradient-to-r from-emerald-400 to-transparent transition-transform duration-300 group-hover:scale-x-100" />
     </article>
   );
 }
@@ -211,7 +211,7 @@ export function AdminStats({ stats, isLoading }: AdminStatsProps) {
           value={stats.users.total.toLocaleString()}
           hint={`${stats.users.customers} customers · ${stats.users.providers} providers`}
           trend={[stats.users.customers, stats.users.customers + 4, stats.users.customers + 6, stats.users.total]}
-          tone="lime"
+          tone="emerald"
           icon={UsersIcon}
           isLoading={isLoading}
         />
@@ -305,7 +305,7 @@ export function AdminStats({ stats, isLoading }: AdminStatsProps) {
           </p>
           <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-secondary/60">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-lime-400 to-emerald-400"
+              className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-400"
               style={{
                 width: stats.users.total
                   ? `${((stats.users.total - stats.users.suspended) / stats.users.total) * 100}%`
@@ -467,7 +467,7 @@ function TopCustomersList({ stats, isLoading }: { stats: AdminStats; isLoading?:
                   className="flex items-center justify-between gap-3 rounded-lg border border-border bg-secondary/30 px-3 py-2.5"
                 >
                   <div className="flex min-w-0 items-center gap-3">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-lime-400/30 bg-lime-400/10 text-[11px] font-semibold text-lime-300">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-emerald-500/30 bg-emerald-500/10 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
                       {index + 1}
                     </span>
                     <div className="min-w-0">

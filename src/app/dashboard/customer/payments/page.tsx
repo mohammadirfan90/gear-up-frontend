@@ -44,7 +44,6 @@ export default function CustomerPaymentsPage() {
     <DashboardShell
       eyebrow="Customer workspace"
       title="Payments"
-      description="Every charge, refund, and outstanding payment in one place."
       tabs={tabs}
       actions={
         <Button asChild variant="secondary" size="sm">

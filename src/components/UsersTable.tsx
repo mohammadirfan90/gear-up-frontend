@@ -19,6 +19,7 @@ import {
   XCircleIcon,
 } from "@phosphor-icons/react/dist/ssr";
 import toast from "react-hot-toast";
+import { getApiErrorMessage } from "@/shared/apiError";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/shared/utils/cn";
 import {
@@ -36,7 +37,7 @@ const LIMIT = 12;
 
 const ROLE_TONE: Record<string, string> = {
   customer: "border-blue-400/30 bg-blue-500/10 text-blue-300",
-  provider: "border-lime-400/30 bg-lime-400/10 text-lime-300",
+  provider: "border-teal-400/30 bg-teal-500/10 text-teal-300",
   admin: "border-violet-400/30 bg-violet-500/10 text-violet-300",
 };
 
@@ -88,7 +89,7 @@ export function UsersTable({ currentUserId }: UsersTableProps) {
       queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
     },
     onError: (error: Error) =>
-      toast.error(error.message || "Unable to update user status"),
+      toast.error(getApiErrorMessage(error, "Unable to update user status")),
   });
 
   const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -182,7 +183,7 @@ export function UsersTable({ currentUserId }: UsersTableProps) {
             <button
               type="button"
               onClick={() => usersQuery.refetch()}
-              className="mt-3 text-[12px] font-medium text-lime-300 hover:text-lime-200"
+              className="mt-3 text-[12px] font-medium text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
             >
               Try again
             </button>
@@ -278,7 +279,7 @@ function UserRow({
           <p className="truncate text-[13px] font-medium text-foreground">
             {user.name}
             {isSelf ? (
-              <span className="ml-2 rounded-md border border-lime-400/30 bg-lime-400/10 px-1.5 py-0.5 text-[10px] font-semibold text-lime-300">
+              <span className="ml-2 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
                 You
               </span>
             ) : null}

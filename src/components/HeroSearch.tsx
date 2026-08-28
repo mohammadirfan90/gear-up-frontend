@@ -17,23 +17,23 @@ export function HeroSearch() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="mx-auto flex w-full max-w-xl items-center gap-2 rounded-xl border border-border glass-strong p-1.5 shadow-elevated"
+      className="mx-auto flex w-full max-w-xl items-center gap-2 rounded-xl border border-white/20 bg-black/60 p-1.5 shadow-2xl backdrop-blur-md transition-colors focus-within:border-emerald-400/50"
     >
       <div className="flex flex-1 items-center gap-2 px-3">
         <MagnifyingGlassIcon
           weight="bold"
-          className="h-4 w-4 shrink-0 text-muted-foreground"
+          className="h-4 w-4 shrink-0 text-white/60"
         />
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search bikes, tents, kayaks…"
-          className="h-10 w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
+          className="h-10 w-full bg-transparent text-sm text-white placeholder:text-white/60 focus:outline-none"
         />
       </div>
       <button
         type="submit"
-        className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-gradient-to-br from-lime-300 via-lime-400 to-lime-500 px-4 text-sm font-semibold text-black shadow-glow transition-transform hover:scale-[1.02]"
+        className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-600 px-4 text-sm font-semibold text-white shadow-glow transition-transform hover:scale-[1.02]"
       >
         Browse
         <ArrowRightIcon weight="bold" className="h-3.5 w-3.5" />

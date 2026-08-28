@@ -139,7 +139,6 @@ export default function CustomerDashboardPage() {
     <DashboardShell
       eyebrow="Customer workspace"
       title={`Good to see you, ${firstName}.`}
-      description="Track active rentals, settle payments, and get ready for what’s next."
       tabs={tabs}
       actions={
         <Button asChild variant="secondary" size="sm">
@@ -154,7 +153,7 @@ export default function CustomerDashboardPage() {
         {metrics.map(({ label, value, detail, description, icon: Icon, tone }) => (
           <article
             key={label}
-            className="group relative overflow-hidden rounded-xl border border-border bg-card/60 p-5 shadow-elevated transition-colors hover:border-lime-400/20"
+            className="group relative overflow-hidden rounded-xl border border-border bg-card/60 p-5 shadow-elevated transition-colors hover:border-emerald-500/30"
           >
             <div className="flex items-start justify-between gap-4">
               <div>
@@ -177,7 +176,7 @@ export default function CustomerDashboardPage() {
                 <Icon weight="duotone" className="h-5 w-5" />
               </span>
             </div>
-            <div className="absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 bg-gradient-to-r from-lime-300 to-transparent transition-transform duration-300 group-hover:scale-x-100" />
+            <div className="absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 bg-gradient-to-r from-emerald-400 to-transparent transition-transform duration-300 group-hover:scale-x-100" />
           </article>
         ))}
       </section>
@@ -213,7 +212,7 @@ export default function CustomerDashboardPage() {
               <button
                 type="button"
                 onClick={() => ordersQuery.refetch()}
-                className="mt-3 text-[12px] font-medium text-lime-300 hover:text-lime-200"
+                className="mt-3 text-[12px] font-medium text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
               >
                 Try again
               </button>
@@ -272,7 +271,7 @@ export default function CustomerDashboardPage() {
         <aside className="space-y-4">
           <section className="rounded-xl border border-border bg-card/60 p-5">
             <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-lime-300 via-lime-400 to-lime-500 text-sm font-semibold text-black shadow-glow">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-600 text-sm font-semibold text-white shadow-glow">
                 {(user?.name ?? "GU")
                   .split(" ")
                   .map((part) => part[0])

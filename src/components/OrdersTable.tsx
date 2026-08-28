@@ -115,7 +115,7 @@ export function OrdersTable({ initialData, limit = 50, showFilters = true }: Ord
                   className={cn(
                     "rounded-md px-1.5 py-0.5 text-[10px] font-semibold",
                     filter === key
-                      ? "bg-lime-400/20 text-lime-300"
+                      ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-300"
                       : "bg-secondary/60 text-muted-foreground",
                   )}
                 >
@@ -140,7 +140,7 @@ export function OrdersTable({ initialData, limit = 50, showFilters = true }: Ord
           <button
             type="button"
             onClick={() => ordersQuery.refetch()}
-            className="mt-3 text-[12px] font-medium text-lime-300 hover:text-lime-200"
+            className="mt-3 text-[12px] font-medium text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
           >
             Try again
           </button>
@@ -196,7 +196,7 @@ function OrderRow({ order }: { order: RentalOrder }) {
         <div className="min-w-0">
           <Link
             href={`/dashboard/customer/orders/${order.id}`}
-            className="block truncate text-[13px] font-medium text-foreground hover:text-lime-300"
+            className="block truncate text-[13px] font-medium text-foreground hover:text-emerald-500 dark:hover:text-emerald-400"
           >
             Order #{shortId}
           </Link>

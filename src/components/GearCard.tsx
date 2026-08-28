@@ -12,16 +12,16 @@ interface GearCardProps {
 const FALLBACK_GRADIENTS: Record<string, string> = {
   "1": "from-amber-300/40 via-rose-500/30 to-fuchsia-700/30",
   "2": "from-cyan-400/30 via-sky-500/30 to-indigo-700/30",
-  "3": "from-lime-300/40 via-emerald-500/30 to-teal-700/30",
+  "3": "from-emerald-300/40 via-teal-500/30 to-emerald-700/30",
   "4": "from-orange-300/40 via-pink-500/30 to-purple-700/30",
 };
 
-const formatPrice = (price: number) =>
+const formatPrice = (price: number | string) =>
   new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
     maximumFractionDigits: 0,
-  }).format(price);
+  }).format(Number(price || 0));
 
 export function GearCard({ gear, className }: GearCardProps) {
   const cover = gear.images?.[0];
@@ -31,7 +31,7 @@ export function GearCard({ gear, className }: GearCardProps) {
     <Link
       href={`/gear/${gear.id}`}
       className={cn(
-        "group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-all hover:-translate-y-0.5 hover:border-lime-400/30 hover:shadow-glow",
+        "group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-all hover:-translate-y-0.5 hover:border-emerald-500/40 hover:shadow-glow",
         className,
       )}
     >
@@ -46,7 +46,7 @@ export function GearCard({ gear, className }: GearCardProps) {
           fallbackLabel="No image"
         />
         <div className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-md border border-white/10 bg-black/60 px-2 py-1 text-[11px] font-medium text-white backdrop-blur">
-          <ShieldCheckIcon weight="duotone" className="h-3 w-3 text-lime-300" />
+          <ShieldCheckIcon weight="duotone" className="h-3 w-3 text-emerald-400" />
           {gear.isAvailable ? "Available" : "Unavailable"}
         </div>
         <div className="absolute right-3 top-3 rounded-md border border-white/10 bg-black/60 px-2 py-1 text-[11px] font-medium text-white backdrop-blur">

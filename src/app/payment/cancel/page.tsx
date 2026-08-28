@@ -122,7 +122,7 @@ function PaymentCancelContent() {
         <section className="overflow-hidden rounded-2xl border border-border bg-card/60">
           <header className="flex items-center justify-between border-b border-border bg-secondary/30 px-6 py-4">
             <div className="flex items-center gap-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-lime-400/30 bg-lime-400/10 text-lime-300">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                 <ReceiptIcon weight="duotone" className="h-4 w-4" />
               </span>
               <div>
@@ -183,8 +183,8 @@ function PaymentCancelContent() {
                   }
                 />
                 <SnapshotRow
-                  label="Provider"
-                  value={order.customer?.name ?? "Verified provider"}
+                  label="Booked by"
+                  value={order.customer?.name ?? "You"}
                 />
               </dl>
             ) : (
@@ -301,7 +301,7 @@ export default function PaymentCancelPage() {
         <div className="container mx-auto flex min-h-[70vh] max-w-3xl items-center justify-center px-6 py-16">
           <SpinnerGapIcon
             weight="bold"
-            className="h-6 w-6 animate-spin text-lime-400"
+            className="h-6 w-6 animate-spin text-emerald-500 dark:text-emerald-400"
           />
         </div>
       }

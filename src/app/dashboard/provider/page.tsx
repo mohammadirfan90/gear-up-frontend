@@ -6,7 +6,6 @@ import { useQuery } from "@tanstack/react-query";
 import {
   ArrowRightIcon,
   CheckCircleIcon,
-  FlagBannerIcon,
   PackageIcon,
   PencilIcon,
   PlusIcon,
@@ -16,7 +15,8 @@ import {
   TrashIcon,
   WarningCircleIcon,
 } from "@phosphor-icons/react/dist/ssr";
-import { DashboardShell, type DashboardTab } from "@/components/DashboardShell";
+import { DashboardShell } from "@/components/DashboardShell";
+import { PROVIDER_NAV_TABS } from "@/components/dashboards/providerNav";
 import { Button } from "@/components/ui/Button";
 import { AddGearModal, type GearFormValues } from "@/components/AddGearModal";
 import { fetchCategories, type Category } from "@/shared/categories";
@@ -24,33 +24,33 @@ import { fetchGearList, type GearSummary } from "@/shared/gear";
 import { useAuthStore } from "@/store/authStore";
 import { cn } from "@/shared/utils/cn";
 
-const tabs: DashboardTab[] = [
-  {
-    label: "Overview",
-    href: "/dashboard/provider",
-    icon: StorefrontIcon,
-    description: "Inventory and rental activity",
-  },
-  {
-    label: "Orders",
-    href: "/dashboard/provider/orders",
-    icon: ReceiptIcon,
-    description: "Manage incoming orders",
-  },
-  {
-    label: "Profile",
-    href: "/dashboard/provider/profile",
-    icon: FlagBannerIcon,
-    description: "Account settings",
-  },
-];
-
 const formatMoney = (value: number) =>
   new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
     maximumFractionDigits: 0,
   }).format(value);
+
+/**
+ * Specifications live on the wire as `Record<string, unknown>` (the Prisma
+ * `Json?` field). The provider modal's input contract is plain
+ * `Record<string, string>`, so flatten any non-string values to JSON before
+ * seeding the form. Anything that can't be represented as a key/value pair
+ * (arrays, nested objects) is stringified so the provider can still see and
+ * edit it.
+ */
+const normalizeSpecifications = (
+  raw: Record<string, unknown> | null | undefined,
+): Record<string, string> => {
+  if (!raw) return {};
+  const out: Record<string, string> = {};
+  for (const [key, value] of Object.entries(raw)) {
+    if (value === null || value === undefined) continue;
+    out[key] =
+      typeof value === "string" ? value : JSON.stringify(value);
+  }
+  return out;
+};
 
 export default function ProviderDashboardPage() {
   const user = useAuthStore((state) => state.user);
@@ -95,7 +95,7 @@ export default function ProviderDashboardPage() {
       value: gear.length,
       description: "Pieces in your catalogue",
       icon: PackageIcon,
-      tone: "text-lime-300 bg-lime-400/10 border-lime-400/20",
+      tone: "text-emerald-300 bg-emerald-400/10 border-emerald-400/20",
     },
     {
       label: "Available now",
@@ -146,6 +146,7 @@ export default function ProviderDashboardPage() {
       stock: Number(item.stock ?? 0),
       isAvailable: item.isAvailable,
       images: item.images ?? [],
+      specifications: normalizeSpecifications(item.specifications),
       categoryId: item.category.id,
     };
   }, [modalState]);
@@ -156,8 +157,9 @@ export default function ProviderDashboardPage() {
     <DashboardShell
       eyebrow="Provider workspace"
       title={`Welcome back, ${user?.name?.split(" ")[0] ?? "partner"}.`}
-      description="Manage your catalogue, track inventory, and respond to incoming rentals."
-      tabs={tabs}
+      description=""
+      tabs={PROVIDER_NAV_TABS}
+      variant="sidebar"
       actions={
         <Button size="sm" onClick={openCreate}>
           <PlusIcon weight="bold" className="h-3.5 w-3.5" />
@@ -169,7 +171,7 @@ export default function ProviderDashboardPage() {
         {totalsCards.map(({ label, value, description, icon: Icon, tone }) => (
           <article
             key={label}
-            className="group relative overflow-hidden rounded-xl border border-border bg-card/60 p-5 shadow-elevated transition-colors hover:border-lime-400/20"
+            className="group relative overflow-hidden rounded-xl border border-border bg-card/60 p-5 shadow-elevated transition-colors hover:border-emerald-500/30"
           >
             <div className="flex items-start justify-between gap-4">
               <div>
@@ -187,7 +189,7 @@ export default function ProviderDashboardPage() {
                 <Icon weight="duotone" className="h-5 w-5" />
               </span>
             </div>
-            <div className="absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 bg-gradient-to-r from-lime-300 to-transparent transition-transform duration-300 group-hover:scale-x-100" />
+            <div className="absolute inset-x-0 bottom-0 h-px origin-left scale-x-0 bg-gradient-to-r from-emerald-400 to-transparent transition-transform duration-300 group-hover:scale-x-100" />
           </article>
         ))}
       </section>
@@ -227,7 +229,7 @@ export default function ProviderDashboardPage() {
             <button
               type="button"
               onClick={() => gearQuery.refetch()}
-              className="mt-3 text-[12px] font-medium text-lime-300 hover:text-lime-200"
+              className="mt-3 text-[12px] font-medium text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
             >
               Try again
             </button>
@@ -293,7 +295,7 @@ export default function ProviderDashboardPage() {
 
       {gearQuery.isFetching && !isLoading ? (
         <div className="fixed bottom-6 right-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3 py-1.5 text-[11px] text-muted-foreground backdrop-blur">
-          <SpinnerGapIcon weight="bold" className="h-3 w-3 animate-spin text-lime-400" />
+          <SpinnerGapIcon weight="bold" className="h-3 w-3 animate-spin text-emerald-500 dark:text-emerald-400" />
           Syncing inventory…
         </div>
       ) : null}

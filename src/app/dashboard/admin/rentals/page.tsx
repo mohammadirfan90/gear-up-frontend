@@ -11,13 +11,11 @@ import {
   CurrencyDollarIcon,
   PackageIcon,
   ReceiptIcon,
-  ShoppingBagIcon,
   SpinnerGapIcon,
-  UserCircleIcon,
-  UsersIcon,
 } from "@phosphor-icons/react/dist/ssr";
-import { DashboardShell, type DashboardTab } from "@/components/DashboardShell";
+import { DashboardShell } from "@/components/DashboardShell";
 import { Button } from "@/components/ui/Button";
+import { ADMIN_NAV_TABS } from "@/components/dashboards/adminNav";
 import { cn } from "@/shared/utils/cn";
 import {
   fetchAdminRentals,
@@ -25,39 +23,6 @@ import {
   type AdminRentalListParams,
 } from "@/shared/admin";
 import { ORDER_STATUS_LABELS, ORDER_STATUS_TONE } from "@/shared/order";
-
-const tabs: DashboardTab[] = [
-  {
-    label: "Overview",
-    href: "/dashboard/admin",
-    icon: ShoppingBagIcon,
-    description: "Platform health and KPIs",
-  },
-  {
-    label: "Users",
-    href: "/dashboard/admin/users",
-    icon: UsersIcon,
-    description: "Manage accounts and roles",
-  },
-  {
-    label: "Rentals",
-    href: "/dashboard/admin/rentals",
-    icon: PackageIcon,
-    description: "Audit rentals and transactions",
-  },
-  {
-    label: "Gear",
-    href: "/dashboard/admin/gear",
-    icon: ReceiptIcon,
-    description: "Moderate listings",
-  },
-  {
-    label: "Profile",
-    href: "/dashboard/admin/profile",
-    icon: UserCircleIcon,
-    description: "Account settings",
-  },
-];
 
 const LIMIT = 12;
 
@@ -142,7 +107,8 @@ export default function AdminRentalsPage() {
       eyebrow="Admin workspace"
       title="Rental audit"
       description="Inspect every rental flowing through the marketplace. Filter, search, and review transaction history."
-      tabs={tabs}
+      tabs={ADMIN_NAV_TABS}
+      variant="sidebar"
       actions={
         <Button asChild variant="secondary" size="sm">
           <Link href="/dashboard/admin">
@@ -166,7 +132,7 @@ export default function AdminRentalsPage() {
                 Across all statuses and providers
               </p>
             </div>
-            <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-lime-400/20 bg-lime-400/10 text-lime-300">
+            <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
               <PackageIcon weight="duotone" className="h-5 w-5" />
             </span>
           </div>
@@ -262,7 +228,7 @@ export default function AdminRentalsPage() {
             <button
               type="button"
               onClick={() => rentalsQuery.refetch()}
-              className="mt-3 text-[12px] font-medium text-lime-300 hover:text-lime-200"
+              className="mt-3 text-[12px] font-medium text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
             >
               Try again
             </button>
@@ -334,7 +300,7 @@ export default function AdminRentalsPage() {
 
       {rentalsQuery.isFetching && !rentalsQuery.isPending ? (
         <div className="fixed bottom-6 right-6 inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3 py-1.5 text-[11px] text-muted-foreground backdrop-blur">
-          <SpinnerGapIcon weight="bold" className="h-3 w-3 animate-spin text-lime-400" />
+          <SpinnerGapIcon weight="bold" className="h-3 w-3 animate-spin text-emerald-500 dark:text-emerald-400" />
           Syncing rentals…
         </div>
       ) : null}
@@ -360,7 +326,7 @@ function RentalRow({ rental }: { rental: AdminRental }) {
         <div className="min-w-0">
           <Link
             href={`/dashboard/admin/rentals/${rental.id}`}
-            className="block truncate text-[13px] font-medium text-foreground hover:text-lime-300"
+            className="block truncate text-[13px] font-medium text-foreground hover:text-emerald-500 dark:hover:text-emerald-400"
           >
             Order #{shortId}
           </Link>

@@ -12,6 +12,7 @@ import {
   XIcon,
 } from "@phosphor-icons/react/dist/ssr";
 import toast from "react-hot-toast";
+import { getApiErrorMessage } from "@/shared/apiError";
 import { Button } from "@/components/ui/Button";
 import { Input, Field } from "@/components/ui/Input";
 import { cn } from "@/shared/utils/cn";
@@ -108,7 +109,8 @@ export function AddGearModal({
       toast.success("Gear listed");
       onClose();
     },
-    onError: (error: Error) => toast.error(error.message || "Unable to create gear"),
+    onError: (error: unknown) =>
+      toast.error(getApiErrorMessage(error, "Unable to create gear")),
   });
 
   const updateMutation = useMutation({
@@ -122,7 +124,8 @@ export function AddGearModal({
       toast.success("Gear updated");
       onClose();
     },
-    onError: (error: Error) => toast.error(error.message || "Unable to update gear"),
+    onError: (error: unknown) =>
+      toast.error(getApiErrorMessage(error, "Unable to update gear")),
   });
 
   const deleteMutation = useMutation({
@@ -134,7 +137,8 @@ export function AddGearModal({
       toast.success("Gear removed");
       onClose();
     },
-    onError: (error: Error) => toast.error(error.message || "Unable to delete gear"),
+    onError: (error: unknown) =>
+      toast.error(getApiErrorMessage(error, "Unable to delete gear")),
   });
 
   const isMutating =
@@ -149,6 +153,16 @@ export function AddGearModal({
     setTouched(true);
     if (!validation.isValid) return;
 
+    // Drop empty spec rows (no key) so users don't accidentally save
+    // orphan `{ "": "..." }` entries that would render as a blank row on the
+    // detail page.
+    const cleanedSpecs: Record<string, string> = {};
+    for (const [key, value] of Object.entries(form.specifications ?? {})) {
+      const trimmedKey = key.trim();
+      if (!trimmedKey) continue;
+      cleanedSpecs[trimmedKey] = value;
+    }
+
     const payload = {
       name: form.name.trim(),
       description: form.description.trim(),
@@ -157,7 +171,7 @@ export function AddGearModal({
       stock: Number(form.stock),
       isAvailable: form.isAvailable,
       images: form.images,
-      specifications: form.specifications,
+      specifications: cleanedSpecs,
       categoryId: form.categoryId,
     };
 
@@ -194,6 +208,53 @@ export function AddGearModal({
       ...prev,
       images: prev.images.filter((_, current) => current !== index),
     }));
+  };
+
+  const handleAddSpec = () => {
+    setForm((prev) => ({
+      ...prev,
+      specifications: { ...(prev.specifications ?? {}), "": "" },
+    }));
+  };
+
+  const handleUpdateSpecKey = (index: number, nextKey: string) => {
+    setForm((prev) => {
+      const entries = Object.entries(prev.specifications ?? {});
+      if (index < 0 || index >= entries.length) return prev;
+      const [, value] = entries[index];
+      const nextEntries = [...entries];
+      nextEntries[index] = [nextKey, value];
+      return {
+        ...prev,
+        specifications: Object.fromEntries(nextEntries),
+      };
+    });
+  };
+
+  const handleUpdateSpecValue = (index: number, nextValue: string) => {
+    setForm((prev) => {
+      const entries = Object.entries(prev.specifications ?? {});
+      if (index < 0 || index >= entries.length) return prev;
+      const [key] = entries[index];
+      const nextEntries = [...entries];
+      nextEntries[index] = [key, nextValue];
+      return {
+        ...prev,
+        specifications: Object.fromEntries(nextEntries),
+      };
+    });
+  };
+
+  const handleRemoveSpec = (index: number) => {
+    setForm((prev) => {
+      const entries = Object.entries(prev.specifications ?? {});
+      if (index < 0 || index >= entries.length) return prev;
+      const nextEntries = entries.filter((_, current) => current !== index);
+      return {
+        ...prev,
+        specifications: Object.fromEntries(nextEntries),
+      };
+    });
   };
 
   const handleDelete = () => {
@@ -237,11 +298,11 @@ export function AddGearModal({
       <div className="relative z-10 flex max-h-[92vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-border bg-card glass-strong shadow-elevated animate-fade-in-up">
         <div className="flex items-start justify-between gap-4 border-b border-border px-6 py-5">
           <div className="flex items-start gap-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-lime-400/30 bg-lime-400/10 text-lime-300">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
               <PackageIcon weight="duotone" className="h-5 w-5" />
             </span>
             <div className="min-w-0">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-lime-400">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400">
                 {isEdit ? "Edit gear" : "Add new gear"}
               </p>
               <h2
@@ -440,6 +501,64 @@ export function AddGearModal({
             )}
           </Field>
 
+          <Field
+            label="Specifications"
+            htmlFor="gear-specs"
+            hint="Optional key/value pairs shown on the gear detail page (e.g. Weight: 1.2kg)."
+          >
+            <div className="space-y-2">
+              {Object.entries(form.specifications ?? {}).map(([key, value], index) => (
+                <div
+                  key={`spec-${index}`}
+                  className="flex items-center gap-2"
+                >
+                  <Input
+                    aria-label={`Specification ${index + 1} name`}
+                    value={key}
+                    onChange={(event) =>
+                      handleUpdateSpecKey(index, event.target.value)
+                    }
+                    placeholder="Name (e.g. Weight)"
+                    className="flex-1"
+                    maxLength={60}
+                  />
+                  <Input
+                    aria-label={`Specification ${index + 1} value`}
+                    value={value}
+                    onChange={(event) =>
+                      handleUpdateSpecValue(index, event.target.value)
+                    }
+                    placeholder="Value (e.g. 1.2kg)"
+                    className="flex-1"
+                    maxLength={120}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveSpec(index)}
+                    aria-label={`Remove specification ${index + 1}`}
+                    className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-border bg-secondary/30 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
+                  >
+                    <TrashIcon weight="bold" className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={handleAddSpec}
+              >
+                <PlusIcon weight="bold" className="h-3.5 w-3.5" />
+                Add specification
+              </Button>
+              {Object.keys(form.specifications ?? {}).length === 0 ? (
+                <p className="text-[12px] text-muted-foreground">
+                  Add specs like weight, materials, or dimensions to help renters compare.
+                </p>
+              ) : null}
+            </div>
+          </Field>
+
           <Field label="Availability" htmlFor="gear-available">
             <label
               htmlFor="gear-available"
@@ -460,7 +579,7 @@ export function AddGearModal({
                 onChange={(event) =>
                   setForm({ ...form, isAvailable: event.target.checked })
                 }
-                className="h-4 w-4 rounded border-input bg-secondary/40 text-lime-400 focus-visible:ring-2 focus-visible:ring-lime-300/40"
+                className="h-4 w-4 rounded border-input bg-secondary/40 text-emerald-500 focus-visible:ring-2 focus-visible:ring-emerald-400/40"
               />
             </label>
           </Field>

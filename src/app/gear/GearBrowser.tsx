@@ -141,7 +141,7 @@ export function GearBrowser({ categories }: GearBrowserProps) {
           </span>
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-1.5 text-foreground hover:text-lime-300"
+            className="inline-flex items-center gap-1.5 text-foreground hover:text-emerald-500 dark:hover:text-emerald-400"
           >
             Track your rentals
             <ArrowRightIcon weight="bold" className="h-3.5 w-3.5" />

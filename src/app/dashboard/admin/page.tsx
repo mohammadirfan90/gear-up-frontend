@@ -7,53 +7,17 @@ import {
   CheckCircleIcon,
   ClockCountdownIcon,
   GearIcon,
-  PackageIcon,
-  ReceiptIcon,
   ShieldCheckIcon,
-  ShoppingBagIcon,
   SpinnerGapIcon,
-  UserCircleIcon,
   UsersIcon,
 } from "@phosphor-icons/react/dist/ssr";
-import { DashboardShell, type DashboardTab } from "@/components/DashboardShell";
+import { DashboardShell } from "@/components/DashboardShell";
 import { Button } from "@/components/ui/Button";
 import { AdminStats } from "@/components/AdminStats";
+import { ADMIN_NAV_TABS } from "@/components/dashboards/adminNav";
 import { fetchAdminStats, fetchAdminUsers } from "@/shared/admin";
 import { useAuthStore } from "@/store/authStore";
 import { cn } from "@/shared/utils/cn";
-
-const tabs: DashboardTab[] = [
-  {
-    label: "Overview",
-    href: "/dashboard/admin",
-    icon: ShoppingBagIcon,
-    description: "Platform health and KPIs",
-  },
-  {
-    label: "Users",
-    href: "/dashboard/admin/users",
-    icon: UsersIcon,
-    description: "Manage accounts and roles",
-  },
-  {
-    label: "Rentals",
-    href: "/dashboard/admin/rentals",
-    icon: PackageIcon,
-    description: "Audit rentals and transactions",
-  },
-  {
-    label: "Gear",
-    href: "/dashboard/admin/gear",
-    icon: ReceiptIcon,
-    description: "Moderate listings",
-  },
-  {
-    label: "Profile",
-    href: "/dashboard/admin/profile",
-    icon: UserCircleIcon,
-    description: "Account settings",
-  },
-];
 
 const formatDate = (value: string) =>
   new Intl.DateTimeFormat("en-US", {
@@ -69,7 +33,7 @@ const STATUS_TONE: Record<string, string> = {
 
 const ROLE_TONE: Record<string, string> = {
   customer: "border-blue-400/30 bg-blue-500/10 text-blue-300",
-  provider: "border-lime-400/30 bg-lime-400/10 text-lime-300",
+  provider: "border-teal-400/30 bg-teal-500/10 text-teal-300",
   admin: "border-violet-400/30 bg-violet-500/10 text-violet-300",
 };
 
@@ -103,7 +67,8 @@ export default function AdminDashboardPage() {
       eyebrow="Admin workspace"
       title={`Welcome back, ${firstName}.`}
       description="Monitor marketplace health, moderate listings, and act on platform signals."
-      tabs={tabs}
+      tabs={ADMIN_NAV_TABS}
+      variant="sidebar"
       actions={
         <Button asChild variant="secondary" size="sm">
           <Link href="/dashboard/admin/users">
@@ -225,7 +190,7 @@ export default function AdminDashboardPage() {
         <aside className="space-y-4">
           <section className="rounded-xl border border-border bg-card/60 p-5">
             <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-lime-400/30 bg-lime-400/10 text-lime-300">
+              <span className="flex h-10 w-10 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                 <ShieldCheckIcon weight="duotone" className="h-5 w-5" />
               </span>
               <div>
@@ -259,7 +224,7 @@ export default function AdminDashboardPage() {
                     weight="bold"
                     className={cn(
                       "h-3 w-3",
-                      statsQuery.isRefetching ? "animate-spin text-lime-400" : "text-muted-foreground",
+                      statsQuery.isRefetching ? "animate-spin text-emerald-500 dark:text-emerald-400" : "text-muted-foreground",
                     )}
                   />
                   {generatedAt}

@@ -42,40 +42,27 @@ export const rangeOverlapsReserved = (
   end: string,
   reserved: DateRange[],
 ): boolean => {
-  const startDate = parseDateInput(start);
-  const endDate = parseDateInput(end);
-  if (!startDate || !endDate) return false;
+  const startStr = start.slice(0, 10);
+  const endStr = end.slice(0, 10);
+  if (!startStr || !endStr) return false;
   return reserved.some((range) => {
-    const reservedStart = parseDateInput(range.startDate);
-    const reservedEnd = parseDateInput(range.endDate);
-    if (!reservedStart || !reservedEnd) return false;
-    return (
-      isWithinInterval(startDate, {
-        start: reservedStart,
-        end: reservedEnd,
-      }) ||
-      isWithinInterval(endDate, {
-        start: reservedStart,
-        end: reservedEnd,
-      }) ||
-      isBefore(reservedStart, startDate) && isAfter(reservedEnd, endDate)
-    );
+    const rStart = range.startDate.slice(0, 10);
+    const rEnd = range.endDate.slice(0, 10);
+    return startStr <= rEnd && endStr >= rStart;
   });
 };
 
 export const isDateInReservedRanges = (
   date: Date,
   reserved: DateRange[],
-): boolean =>
-  reserved.some((range) => {
-    const reservedStart = parseDateInput(range.startDate);
-    const reservedEnd = parseDateInput(range.endDate);
-    if (!reservedStart || !reservedEnd) return false;
-    return isWithinInterval(date, {
-      start: reservedStart,
-      end: reservedEnd,
-    });
+): boolean => {
+  const dateStr = toDateInput(date);
+  return reserved.some((range) => {
+    const startStr = range.startDate.slice(0, 10);
+    const endStr = range.endDate.slice(0, 10);
+    return dateStr >= startStr && dateStr <= endStr;
   });
+};
 
 export const isReservedBeforeRange = (
   date: Date,
