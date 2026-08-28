@@ -67,11 +67,11 @@ function PaymentCancelContent() {
   return (
     <div className="container mx-auto flex min-h-[80vh] max-w-5xl flex-col items-center px-6 py-12 sm:py-16">
       <div className="flex w-full max-w-3xl flex-col items-center text-center">
-        <span className="flex h-20 w-20 items-center justify-center rounded-full border border-amber-400/30 bg-amber-500/10 text-amber-300 shadow-glow">
+        <span className="flex h-20 w-20 items-center justify-center rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-300 shadow-glow">
           <WarningCircleIcon weight="duotone" className="h-10 w-10" />
         </span>
 
-        <p className="mt-6 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-300">
+        <p className="mt-6 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-600 dark:text-amber-300">
           Payment cancelled
         </p>
         <h1 className="mt-3 text-balance text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
@@ -82,13 +82,13 @@ function PaymentCancelContent() {
         </p>
       </div>
 
-      <section className="mt-10 w-full max-w-3xl overflow-hidden rounded-2xl border border-amber-400/30 bg-amber-500/5">
-        <header className="flex items-center gap-3 border-b border-amber-400/20 px-6 py-4">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-amber-400/30 bg-amber-500/10 text-amber-300">
+      <section className="mt-10 w-full max-w-3xl overflow-hidden rounded-2xl border border-amber-500/30 bg-amber-500/5 dark:bg-amber-500/10">
+        <header className="flex items-center gap-3 border-b border-amber-500/20 px-6 py-4">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-300">
             <WarningCircleIcon weight="duotone" className="h-4 w-4" />
           </span>
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-300">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-600 dark:text-amber-300">
               Action required
             </p>
             <p className="mt-0.5 text-sm font-semibold text-foreground">{reasonMeta.title}</p>
@@ -98,22 +98,22 @@ function PaymentCancelContent() {
           <ReasonItem
             icon={CreditCardIcon}
             title="Update payment method"
-            description="Try a different card or wallet in checkout."
+            description="Try a different card or digital wallet in checkout."
           />
           <ReasonItem
             icon={ClockCountdownIcon}
-            title="Order is still on hold"
-            description="Complete payment within 30 minutes to keep it reserved."
+            title="Order is on hold"
+            description="Your dates and items remain reserved while you complete checkout."
           />
           <ReasonItem
             icon={ShieldCheckIcon}
             title="No funds were captured"
-            description="Your bank statement will not show a charge."
+            description="Your bank statement will not show any charge."
           />
           <ReasonItem
             icon={ReceiptIcon}
-            title="Receipts remain valid"
-            description="Any previous payment attempts are tracked but unused."
+            title="Safe to retry"
+            description="You will never be double-charged when submitting a new card."
           />
         </div>
       </section>
@@ -224,15 +224,15 @@ function PaymentCancelContent() {
             <h3 className="text-sm font-semibold text-foreground">Need help?</h3>
             <ul className="mt-3 space-y-2 text-[12px] text-muted-foreground">
               <li className="flex items-start gap-2">
-                <CheckCircleIcon weight="fill" className="mt-0.5 h-3 w-3 text-emerald-300" />
+                <CheckCircleIcon weight="fill" className="mt-0.5 h-3 w-3 text-emerald-600 dark:text-emerald-400" />
                 Confirm your card supports 3D-Secure.
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircleIcon weight="fill" className="mt-0.5 h-3 w-3 text-emerald-300" />
+                <CheckCircleIcon weight="fill" className="mt-0.5 h-3 w-3 text-emerald-600 dark:text-emerald-400" />
                 Try a different browser or device.
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircleIcon weight="fill" className="mt-0.5 h-3 w-3 text-emerald-300" />
+                <CheckCircleIcon weight="fill" className="mt-0.5 h-3 w-3 text-emerald-600 dark:text-emerald-400" />
                 Contact support if the issue persists.
               </li>
             </ul>
@@ -266,7 +266,7 @@ function ReasonItem({
 }) {
   return (
     <div className="flex items-start gap-3">
-      <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-amber-400/30 bg-amber-500/5 text-amber-300">
+      <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-300">
         <Icon weight="duotone" className="h-3.5 w-3.5" />
       </span>
       <div>
